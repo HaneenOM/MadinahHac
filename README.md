@@ -585,3 +585,95 @@ window. These readings show no consistent count rise approaching Dhuhr.
 Counts in a camera view alone cannot establish the direction of movement
 toward the mosque. The limited coverage and conflicting held-out results
 support retaining the current Friday method and full local score 0.781898.
+
+## I-M forecast fallback trial
+
+Rerun the fixed experiment and build/check its separate candidate with:
+
+```powershell
+.\scripts\run_im_forecast_fallback_trial.ps1 --build-candidate
+```
+
+The current full benchmark was rerun and reproduced **0.7818975063504505**.
+That benchmark has A-H forecast cases, so it does not measure this I-M
+change. The experiment reuses the causal rolling-origin idea from
+`v3_unseen_forecast_proxy.py`, now with all released I-M target minutes and
+every horizon 1-15 instead of every eighth minute and only 5/10/15.
+Cases and their last-three-reading contexts are fixed in `cases.csv`;
+answers are in a separate `labels.csv`, read only after predictions are
+saved. These files and results are in `outputs/im_forecast_fallback_trial/`.
+The estimator-free alternative needs no fitting on either test recording.
+
+T05 explicitly sets I-M forecast model values to NaN via
+`forecast_reference_units`, then uses `ref_forecast`: the latest finite
+reading within five minutes of `now`, inclusive. A reading older than five
+minutes, or no previous reading, yields NaN; no additional numeric fallback
+exists in this path, and submission validation would reject that value.
+This is not unlimited-age persistence. Actual T05 fallback values were
+reproduced for all 555 real requests and matched the saved base within 1e-9.
+All 555 have at least three readings through `now`; none have zero, one or
+two. I-L each have 60 requests on each date; M has 15 Friday and 60 Saturday.
+
+Before looking at errors, input coverage was used to choose one rule:
+if the three most recent readings are all at most five minutes old, use
+`0.5 * (latest + median(last_three))`; otherwise retain T05's fallback.
+All 555 real requests satisfy this rule, with the latest reading aged 0-1
+minutes. It changes 405 predictions; the remaining 150 equal the fallback.
+The rule and coverage counts are saved in `verification.json` and
+`coverage_by_date_camera.csv`.
+
+Of 13,035 fixed pseudo-forecast pairs from 869 distinct released target
+readings, 7,121 have a finite actual T05 fallback (813 distinct readings).
+The other 5,914 are explicitly unscoreable in the paired experiment; neither
+method invents a value for them. The alternative has enough context on
+5,587 pairs and changes 4,028. On all scoreable pairs, MAE falls from
+11.017690 to 10.584249 (3.93%); on changed pairs, 11.283910 to 10.517640
+(6.79%). Every date/camera group improves:
+
+| Date | Camera | All cases | T05 MAE | Candidate MAE | Changed cases | T05 MAE on changed | Candidate MAE on changed |
+|---|---|---:|---:|---:|---:|---:|---:|
+| Sep 18 | I | 859 | 10.121 | 9.714 | 467 | 10.995 | 10.247 |
+| Sep 18 | J | 949 | 11.755 | 11.532 | 547 | 11.894 | 11.506 |
+| Sep 18 | K | 913 | 13.447 | 12.294 | 559 | 12.711 | 10.828 |
+| Sep 18 | L | 634 | 12.526 | 12.146 | 392 | 13.052 | 12.436 |
+| Sep 18 | M | 114 | 3.153 | 3.016 | 37 | 3.220 | 2.799 |
+| Sep 19 | I | 682 | 10.182 | 9.717 | 373 | 9.883 | 9.033 |
+| Sep 19 | J | 740 | 10.764 | 10.324 | 432 | 11.595 | 10.841 |
+| Sep 19 | K | 775 | 14.170 | 13.786 | 357 | 14.967 | 14.133 |
+| Sep 19 | L | 784 | 11.203 | 11.135 | 473 | 11.118 | 11.005 |
+| Sep 19 | M | 671 | 5.000 | 4.669 | 391 | 5.557 | 4.990 |
+
+| Horizon | All cases | T05 MAE | Candidate MAE | Changed cases | T05 MAE on changed | Candidate MAE on changed |
+|---|---:|---:|---:|---:|---:|---:|
+| 1-5 | 3426 | 9.585 | 9.124 | 2013 | 9.852 | 9.068 |
+| 6-10 | 2227 | 11.765 | 11.285 | 1215 | 11.937 | 11.057 |
+| 11-15 | 1468 | 13.228 | 12.929 | 800 | 13.895 | 13.347 |
+
+`scores.csv` contains the full date x camera x horizon breakdown, for all,
+changed, and real-context-matched cases. At horizons 11-15 on Saturday,
+J regresses 10.520 to 10.639 (145 cases), K 17.054 to 17.330 (146), and
+L 16.122 to 16.478 (146). There is no post-hoc camera/horizon tuning.
+
+Coverage is not identical to the real requests. Real requests have 185
+targets in each horizon band, whereas validation favors shorter horizons.
+Restricting validation to the same freshness range as the real requests
+(latest <=1 minute, all three <=5) leaves 5,457 pairs from 700 distinct
+readings, improving 11.094993 to 10.554867 with gains in all ten
+date/camera groups. Friday M is weakly covered: 44 such pairs from only
+12 readings, with none at horizons 11-15. Saturday M has 495 matched pairs.
+The pairs overlap across horizons and come from only two dates; they are
+not thousands of independent events. Actual forecast target labels remain
+unknown. `coverage_by_horizon_band.csv`, `coverage_by_context_age.csv`, and
+`coverage_by_hour.csv` document the input-distribution differences.
+
+The measured consistency supports retaining this as a separate candidate,
+`outputs/submission_t05_hidden_hidden_future_im_fallback_v1.csv`, based on
+`submission_t05_hidden_hidden_future_v1.csv`. It preserves all 4,457 IDs
+in sample order, finite nonnegative values, and changes only 405 I-M
+forecast predictions (225 Friday, 180 Saturday). A-H forecast, hidden,
+hidden-future and missing values are copied verbatim. All preexisting
+submissions retain their SHA-256 hashes. All 13,590 cutoff checks pass
+(13,035 pseudo cases plus 555 actual requests). Candidate verification is
+saved as `candidate_verification.json`; rerunning checks an existing
+candidate rather than overwriting it. Suggested commit message:
+`Add recency-gated median fallback candidate for I-M forecasts`.
