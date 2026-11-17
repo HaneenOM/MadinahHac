@@ -750,3 +750,247 @@ shows the concentration of gains; `outages.csv`, `by_length_sharp.csv`, and
 submissions are unchanged (SHA-256 checked). The retained combined candidate
 is `outputs/submission_t05_hidden_hidden_future_im_fallback_v1.csv`; the
 complete local score remains 0.781898. No missing candidate CSV is generated.
+
+## A-H weekly-template forecast diagnostic
+
+The user-confirmed public Kaggle score is **0.806** for
+`outputs/submission_t05_hidden_hidden_future_im_fallback_v1.csv`. This
+diagnostic preserves that file, every other saved submission, and the
+production predictor. Rerun with:
+
+```powershell
+.\scripts\run_weekly_forecast_diagnostic.ps1
+```
+
+The diagnostic uses the same rolling-origin principle as the earlier I-M
+proxy. To obtain distinct forecast windows, origins are fixed every 30
+minutes starting at 11:15; every released A-H value 1-15 minutes later is a
+target. There are 752 cases in 16 origins on September 18, and 814 in 15
+origins on September 19. Labels and case metadata are separate files in
+`outputs/weekly_forecast_diagnostic/`. Each prediction recording contains
+only released observations through its `now`, with all later values removed.
+Predictions are saved before labels enter scoring. B/G have no released
+Friday targets and D has none on Saturday; those camera/date combinations
+cannot be evaluated by this proxy.
+
+T05's actual A-H template selects the full-length same-weekday historical
+recording (September 11 for September 18, September 12 for September 19).
+It smooths log1p counts using exponential distance weights, bridges short
+historical gaps, and warps clock time between solar-computed Dhuhr/Asr/
+Maghrib/Isha anchors. The shift reads the prior recording about 2.49-7.42
+minutes later over these recordings. These are the existing T05 computed
+anchors, not the supplied prayer CSV. Alignment of levels across historical
+sources is already implemented but has no multi-source effect when only the
+full-length source is selected. Missing template cells can be completed
+using regressions fitted on other eligible historical recordings. The
+six-member ensemble has five lam=0.8 templates and one lam=0.7; the standalone
+template comparison averages their people-scale predictions just as the
+forecast ensemble does.
+
+An exclusion audit found an indirect dependency in the saved T05 fits:
+the other test day's I-M template completion can be trained using the
+evaluated recording's released A-H/I-M observations. Those observations are
+now pseudo-targets in this local diagnostic. The original frozen T05 is
+therefore reported explicitly as an audit, alongside a diagnostic-only
+full refit with the evaluated recording excluded from template fitting and
+covariance fitting. That refit keeps all estimator settings (six members,
+140 steps) and excludes 374/405 indirectly dependent fitting cells. Its
+cache is isolated under this diagnostic's `fit_cache/`; the submitted cache
+is untouched. `fit_exclusion_audit.csv` documents the fitting cell counts.
+
+The latest-reading comparator uses T05's inclusive five-minute recency rule.
+Three-way comparisons are paired only where every method is finite. The
+frozen submitted T05 audit on the common cases is:
+
+| Date | Common targets | Origins | Frozen T05 MAE | Weekly template MAE | Latest MAE |
+|---|---:|---:|---:|---:|---:|
+| Sep 18 | 403 | 9 | 17.155 | 23.810 | 26.691 |
+| Sep 19 | 531 | 9 | 11.230 | 16.765 | 23.779 |
+
+On all primary cases, frozen T05 predicts 752/814 using the model, with
+zero fallbacks and MAE 18.967/13.420. The reduction to 403/531 common cases
+comes from stale/unavailable latest readings. `released_all_t05.csv` reports
+all-case source counts and MAE; `released_by_date.csv`, `released_by_horizon.csv`,
+and `released_by_camera_horizon.csv` report paired comparisons. The frozen
+audit is additionally preserved under `frozen_audit/`.
+
+At each `now`, level divergence is log1p(latest) minus log1p(template) at the
+latest observation's timestamp. Fixed bands are within a 1.25 ratio, between
+1.25 and 2, and over 2. Trend compares slopes fitted to observed log counts
+and the template at those same observed times in the preceding ten minutes;
+it requires at least three points spanning five minutes. Slopes below 0.005
+log units/minute are weak/flat. Diagnostics never use target counts. Groups
+with fewer than 30 target cells or clock timestamps, or five camera-windows/origins are
+flagged. Cases can share clock timestamps across cameras; reports show both
+target timestamps and origin counts so these are not treated as independent.
+
+The original frozen T05 audit beats persistence both within 25% of the
+template and at moderate divergence, on both dates. Severe divergence has
+only 15 common cases from one Saturday camera-window. Friday's flat-trend
+group appears worse than the template, but removing the single 11:15 origin
+reverses that comparison. `released_window_sensitivity.csv` and
+`released_camera_origin_scores.csv` record these concentration checks.
+`five_examples.csv` contains five largest T05 errors from distinct recording/
+origin windows, with all three predictions and observed target counts.
+
+The September 11-12 fixed benchmark is scored separately and reproduced
+without overwriting its outputs: all-case forecast MAE 37.231/17.281,
+model counts 241/462 and fallback counts 695/638. Its existing local fallback
+uses a 30-minute last-reading rule; the paired latest comparator still uses
+five minutes. Only 241/462 cases have the historical template and recent
+reading required for the paired comparison. Prior same-weekday recordings
+are short and cover discontinuous parts of the day. On that common subset,
+T05/template/latest MAEs are 22.432/20.564/43.370 Friday and
+10.993/10.498/18.828 Saturday. The template is better at horizons 11-15
+on these older checks, while T05 is better on both newer recordings;
+this coverage difference limits transfer of a blanket template-weight rule.
+
+Input coverage also differs between the released-target proxy and the real
+requests. All 975 Friday and 1,130 Saturday A-H forecast requests have both
+a five-minute latest value and enough ten-minute history for the trend
+diagnostic. The pseudo cases have only 403/531 recent latest values and
+311/417 complete trend contexts. Among those context-matched cases, the
+original frozen T05 still beats template/latest overall: 17.510 versus
+20.818/24.760 Friday and 11.331 versus 15.175/24.569 Saturday.
+`input_coverage_summary.csv` and `released_matched_input_by_horizon.csv`
+document this. Saturday's context-matched 11-15 minute group favors the
+template, but almost all the gain comes from one evening origin; removing
+that origin removes the evidence for a broad long-horizon rule.
+
+The five examples are chosen from different recording/origin windows and
+explicitly flag whether their input context matches the real requests.
+Two conspicuous A failures at 18:15 have insufficient recent trend history,
+unlike the actual forecast requests, so they cannot alone justify a new
+fallback policy. The severe-divergence example is Saturday G at 18:15:
+latest 36.683, with subsequent latest/T05 MAE 28.848/1.852, based on only
+one origin. Levels diverging from the template do not by themselves show
+that the template's influence should be reduced.
+
+One exploratory next experiment is a small bounded contribution from a
+damped ten-minute observed trend for A/E forecasts at horizons 6-10,
+retaining T05 where the context is insufficient. In the original frozen
+diagnostic, when recent and template trends agree, these cameras lag the
+observed direction on 80% of 20 Friday cases and 95.5% of 22 Saturday cases,
+from only three origins per date. This is a hypothesis for a paired trial,
+not a measured gain from a new predictor. The older Saturday check has the
+opposite signed bias in 10 cases from two origins; it uses short prior
+recordings and the existing 96-cell fitting proxy rather than the full
+primary fit. That is a concrete failure risk to check before adoption.
+No trend correction or new submission is implemented in this diagnostic.
+
+The completed fully excluded refit confirms the paired ranking. The
+following table reports the exact frozen current T05 and the clean refit
+separately, on identical three-way-common targets:
+
+| Date | Horizon | Targets | Current T05 MAE | Clean-fit T05 MAE | Weekly MAE | Latest MAE |
+|---|---|---:|---:|---:|---:|---:|
+| Sep 18 | 1-5 | 194 | 16.917 | 16.547 | 24.125 | 20.785 |
+| Sep 18 | 6-10 | 149 | 19.717 | 18.409 | 24.576 | 30.146 |
+| Sep 18 | 11-15 | 60 | 11.564 | 10.956 | 20.893 | 37.210 |
+| Sep 19 | 1-5 | 237 | 9.992 | 9.751 | 18.731 | 12.533 |
+| Sep 19 | 6-10 | 185 | 11.590 | 10.962 | 15.778 | 26.806 |
+| Sep 19 | 11-15 | 109 | 13.313 | 11.784 | 14.165 | 43.096 |
+
+The clean refit's common-case MAEs are 16.402953/10.590168; its all-case
+MAEs are 20.402136/14.354977, worse than the frozen model's all-case MAEs
+18.966670/13.419983. Thus this fit-isolation control is not adopted as a
+production replacement. On real-context-matched cases, clean MAEs are
+16.886214/10.544087. Moderate level divergence still favors T05 over
+latest on both days: current 24.151 versus 34.283 (167 cases) and 10.779
+versus 24.105 (207 cases); clean-fit values are 22.740 and 9.920. The
+proposed A/E medium-horizon trend experiment remains exploratory: the clean
+fit also lags observed direction on the same 80%/95.5% of those 20/22 cases,
+with signed mean lag 20.492/37.472 people. No prospective gain is claimed.
+
+The 11-15 minute groups have only four origins and 12/19 distinct clock
+timestamps, and are flagged sparse. `released_by_direction.csv` and
+`released_by_signed_level_trend.csv` distinguish rising/falling trends and
+levels above/below the template. Camera-level results with target and origin
+counts are in `released_by_camera.csv` and `released_by_camera_horizon.csv`.
+`verification.json` confirms 9,396 primary member/cutoff checks and 2,036
+benchmark checks; all preexisting submission SHA-256 hashes are unchanged.
+The first run fits twelve diagnostic models in full and can take about an
+hour on this machine; subsequent runs reuse those fit parameters and
+generate the diagnostic predictions again. `--summarize` rebuilds reports
+from saved diagnostic predictions, while `--frozen-only` is a separate audit
+of the original cache and does not meet the full fit-isolation condition.
+This comparison is diagnostic rather than a causal template ablation: T05
+also differs from persistence in its donor and temporal components.
+
+### Prompt 22: audit of cross-camera forecast information
+
+Run `powershell -ExecutionPolicy Bypass -File .\scripts\run_cross_camera_forecast_audit.ps1`.
+Results are in `outputs/cross_camera_forecast_audit/`. This command requires
+the clean weekly diagnostic caches and refuses to fit if any cache is missing.
+It does not alter any predictor, fixed cases, labels, cache, or submission.
+
+Inspection of `t05_forecast/gp.py` found no missing cross-camera observation
+input: `observed` collects all released, finite cells with finite templates;
+`predict_recording(strict=True)` limits them to `t <= now`. The GP conditions on
+their entire log-count deviation histories. Learned camera covariance matrices,
+multiple temporal kernels, camera delays, template-slope timing covariance, and
+(in configured members) same-minute covariance already transfer information
+between cameras. Missing camera inputs are omitted, not filled with future
+values. Levels and recent changes are represented by those histories, although
+this does not guarantee optimal donor weighting or nonlinear calibration.
+
+Accordingly **no redundant residual model was trained**. Instead, an
+inference-only donor-removal ablation measures the information already used:
+keep the same template and cached parameters, but condition each target only
+on its own camera. This ablation is not a proposed correction or submission.
+The command recomputes the clean T05 predictions and checks agreement with the
+weekly diagnostic to 1e-9 before scoring. It excludes the evaluation recording
+both directly and through fitting-template completion. Production/frozen
+parameters retain the indirect dependency documented above and are not used
+to claim clean held-out accuracy. No new fit of any ensemble member is run.
+
+| Date | All cases / windows | Clean T05 MAE | Own-camera-only MAE |
+|---|---:|---:|---:|
+| Sep 18 | 752 / 16 | 20.402136 | 19.838485 |
+| Sep 19 | 814 / 15 | 14.354977 | 14.427517 |
+
+For normalized errors, the denominator is five-minute persistence MAE on the
+**identical reference-eligible targets**, rather than dropping different cases
+per method. All-case normalized errors are undefined when that reference is
+unavailable. The frozen submitted model's all-case MAEs remain 18.966670 and
+13.419983; the clean fit is an isolation control, not a production update.
+
+| Date | Eligible cases / windows | T05 MAE / normalized | Own-only MAE / normalized |
+|---|---:|---:|---:|
+| Sep 18 | 403 / 9 | 16.402953 / 0.614544 | 15.872825 / 0.594683 |
+| Sep 19 | 531 / 9 | 10.590168 / 0.445351 | 11.567719 / 0.486460 |
+
+Removing donors changes all 1,566 pseudo predictions, demonstrating active
+cross-camera conditioning. On reference-eligible cases the donor-removal MAE
+delta remains negative for Friday (-0.949 to -0.226) and positive for Saturday
+(+0.519 to +1.289) after omitting each window in turn. On all cases, Friday
+remains negative (-0.884 to -0.247), while Saturday changes sign (-0.321 to
++0.813). Thus blanket donor removal does not improve both dates robustly.
+Friday A/E benefit on the reference-eligible subset, while Saturday A/E worsen;
+the mechanism is weighting/calibration, not an absence of cross-camera inputs.
+
+Separate older stress results, reusing the verified Sep 11/12 predictions,
+are MAE 37.231374 / 17.281041, normalized 0.873513 / 0.840029, on 936 / 1,100
+cases with 11 origins each. No donor-removal run or learned correction was
+performed on these older cases. Historical template/model coverage is limited
+(241 / 462 model predictions; remaining cases use the benchmark fallback).
+These scores are not pooled with the recent dates or the Kaggle score.
+
+Files `recent_{all,reference_eligible}_by_{date,camera,horizon,window}.csv`
+contain counts, unique windows/timestamps, MAE and eligible normalized errors;
+`recent_leave_one_window_out.csv` lists every omitted-window result. Matching
+`older_*.csv` files contain the separate stress baseline. Long-horizon
+reference-eligible subsets have only four windows and are flagged sparse.
+Released pseudo cases contain no Friday B/G or Saturday D answers; they do not
+validate those camera/day combinations. All 2,105 real A-H forecast requests
+have fresh own-camera and recent-trend context, versus 934 / 728 of the 1,566
+pseudo cases, respectively. This coverage mismatch limits transfer claims.
+
+Decision: retain the accepted 0.806 submission; reject adding another model
+merely to supply cross-camera histories already represented by T05. A future
+experiment could test conservative calibration of existing donor influence,
+but this ablation does not establish a transferable improvement. No candidate
+submission was generated and zero submission rows were changed. The run took
+22.2 seconds, fitted zero models, passed 9,396 member/cutoff checks and template
+perturbation checks, and verified SHA-256 preservation of existing submissions,
+fixed cases, labels and saved weekly predictions. See `verification.json`.
