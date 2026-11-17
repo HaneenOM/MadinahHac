@@ -1267,3 +1267,113 @@ that raw data, fixed cases/labels, cached predictions, T05/production source
 and saved submissions are unchanged. `plan.json`, `verification.json`,
 `by_{date,camera,horizon,window,movement,context,actual_change}.csv`, every
 leave-one-window-out result and label-free predictions preserve the trial.
+
+### Prompt 26: nonlinear simultaneous hidden reconstruction (rejected)
+
+Run `powershell -ExecutionPolicy Bypass -File .\scripts\run_hidden_reconstruction_trial.ps1`.
+Use `--inspect` for the baseline error analysis alone. All results are in
+`outputs/hidden_reconstruction_trial/`. The protected user-reported public
+0.806 submission, production predictors and existing benchmark outputs are
+unchanged; these are local errors, not expected Kaggle scores.
+
+Inspection of the unchanged current predictor confirmed the updated v2
+weights: B uses dropout Ridge at 0.75, G dropout Ridge at 0.50, and D Ridge
+at 0.50, blended with the single-donor estimate. Donor ratios are learned
+from historical overlapping means, with preferred D/E/B donors for B/G/D;
+unavailable preferred donors trigger the next eligible donor, then the
+training target median if none remain. Ridge uses donor values/seen flags,
+training medians for missing values, clock sin/cos and alpha=3000. Its dropout
+variant uses three 20% dropout copies. Below two available donors, it falls
+back to the single donor. It may interpolate visible donors over at most
+two minutes on either side, using only the released feed.
+
+Before model choice, the largest errors showed a specific limitation beyond
+donor absence: global linear/ratio relationships compress different crowd
+regimes. In D, counts above 40 have bias -6.781 over 37 cases/six windows,
+while counts at most 20 have bias +4.413 over 112/eight. B above 40 has bias
+-5.562 over 62/ten. The largest D errors at 13:04 and 13:14 on Sep 12 are
+25.530 and 24.028 people even with ALL seven visible donors present. The
+13:00-13:30 D window has 18 cases, MAE 13.863 and bias -13.684; 18:00-18:30
+has 17, MAE 11.979 and bias +11.979. Baseline analysis by recording, camera,
+30-minute window, availability and crowd group is saved with 25 largest
+errors. Crowd groups use scorer truth for diagnosis only, not as inputs.
+
+One different method was prespecified: a small nonlinear
+HistGradientBoostingRegressor per target camera, with identical settings
+across all folds (75 iterations, learning rate 0.07, seven leaves, depth
+three, minimum leaf size 25, L2=15, absolute-error loss, no early stopping,
+seed 26). It predicts the count directly from exact same-minute visible
+A-H log levels, proportions of visible total, availability flags/total,
+clock, Friday and scheduled prayer-relative time. No target history,
+interpolation or template enters the new model. Native NaN handling and one
+fixed 20% donor-dropout training copy address missing visible donors.
+With fewer than two exact visible donors, retain the unchanged baseline.
+No hyperparameter/model search or blend-weight selection was performed.
+
+Each entire evaluated DATE is excluded before fitting, preprocessing or
+donor selection. B and G are jointly removed for either Friday target;
+Saturday D is entirely removed. Fixed primary cases/feed/reference remain
+unchanged. Auxiliary Sep 4/5 cases use a fixed five-minute released-target
+grid, mask the corresponding hidden cameras for the ENTIRE recording and
+are scored separately. These older dates, like Sep 11/12, have previously
+been inspected and are not fresh independent confirmation. This is
+leave-date-out validation, not a chronological backtest: an eligible other
+training date may be later than the held-out historical date. Production
+test dates are later than all released training dates.
+
+| Date / camera | Targets / 30-min windows | Current MAE | New MAE | Current normalized | New normalized |
+|---|---:|---:|---:|---:|---:|
+| Sep 11 B | 284 / 21 | 5.794805 | 5.726689 | 0.830938 | 0.821171 |
+| Sep 11 G | 276 / 21 | 2.855762 | 2.960481 | 0.916672 | 0.950286 |
+| Sep 12 D | 283 / 20 | 7.227049 | 4.804217 | 0.934333 | 0.621103 |
+
+Normalized error is MAE divided by the SAME-case reference MAE, separately
+for every camera/recording/window. The new model is used on 842/843 primary
+cases; one D case retains baseline. The current predictor and reference
+were freshly reproduced to absolute tolerance 1e-9 against the saved local
+benchmark. Primary date-wide Friday MAE regresses 4.346277 to 4.363344;
+Saturday improves 7.227049 to 4.804217. B wins 12/21 camera-windows, G 8/21,
+D 16/20. After leaving out every window, B's gain ranges -0.171 to +0.247;
+G always loses (-0.218 to -0.034), while D always gains (+2.116 to +2.678).
+Windows are nonoverlapping time blocks, not independent recording replicates;
+B and G share the same underlying crowd events.
+
+| Auxiliary recording / camera | Targets / windows | Current MAE | New MAE | Current normalized | New normalized |
+|---|---:|---:|---:|---:|---:|
+| Sep 4 11:05 B | 35 / 7 | 6.256661 | 5.229148 | 0.990998 | 0.828249 |
+| Sep 4 11:05 G | 26 / 5 | 3.409422 | 3.995585 | 0.838266 | 0.982385 |
+| Sep 5 04:26 D | 41 / 7 | 9.158452 | 9.719344 | 1.001437 | 1.062768 |
+| Sep 5 11:24 D | 24 / 5 | 6.357324 | 5.562904 | 1.011673 | 0.885253 |
+| Sep 5 19:00 D | 24 / 5 | 9.490766 | 6.829160 | 0.921416 | 0.663012 |
+
+Auxiliary coverage is 140/150 new-model predictions, with ten morning D
+fallbacks. D's main gain repeats at midday/evening but not in the short
+morning recording; G worsens on both evaluated Fridays, including +17.2%
+on Sep 4. Small auxiliary groups and already examined dates limit confidence.
+The method therefore fails the prespecified requirement of >=1% gain on
+both primary dates, robust leave-one-window-out gains and no hidden-camera
+regression. Reject the joint method; do not choose a D-only production scope
+after inspecting this trial's evaluation errors. D is a useful finding for a
+separately prespecified future test, not an adopted change here.
+
+For every one of the 993 primary/auxiliary cases, the test replaces ALL
+hidden-camera values across the ENTIRE evaluation recording (adding absent
+columns too) and verifies identical features and predictions for both methods.
+It also mutates held-out hidden values in the original training dataframe
+and confirms the filtered fitting data are identical. Every finite new-model
+donor feature is checked against an exact-minute genuinely released feed
+cell; hidden columns are removed before any aggregation. These same A-H
+visible-input types and scheduled timetable are available in the real test;
+unavailable donors remain NaN and insufficient context retains baseline.
+No hidden-camera labels are used in prediction, fitting or preprocessing;
+scoring labels are joined only after all fold predictions are saved.
+
+The main run took 10.48 seconds (about three more seconds for the separate
+baseline inspection). Twelve small unit/fold estimators share one model
+family and fixed parameters; T05 fits=0. The method was rejected, so the
+conditional full four-task benchmark was not run and no candidate submission
+was generated. Forecast, hidden-future and missing code and saved predictions
+remain unchanged, as do all existing submissions, verified with SHA-256.
+`design.json`, `fit_manifest.json`, `verification.json`, prediction files,
+`fixed_*` and `additional_*` reports preserve the experiment and every
+recording/camera/window MAE, normalization, coverage and omitted-window result.
