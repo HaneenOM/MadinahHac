@@ -1,0 +1,16 @@
+{
+  "mode": "strict",
+  "steps": "140",
+  "members": [
+    {"ells": "3,12,60", "kinds": "ou,m32,ou"},
+    {"ells": "2,13,33", "kinds": "ou,m32,ou", "rank": "4", "same": "0"},
+    {"ells": "2,8,90", "kinds": "ou,m32,ou"},
+    {"ells": "4,45", "kinds": "ou,ou", "only_kinds": "forecast,missing"},
+    {"ells": "2.5,26", "kinds": "ou,ou", "rank": "4", "same": "0", "delay": "0", "only_kinds": "forecast,missing"},
+    {"ells": "3,12,60", "kinds": "ou,m32,ou", "lam": "0.7", "only_kinds": "forecast"}
+  ],
+  "missing_direct": "0.25",
+  "w_hidden": "0.9",
+  "w_hidden-future": "0.85",
+  "keep_base_kinds": "hidden,hidden-future,missing"
+}

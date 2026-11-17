@@ -9,13 +9,10 @@ import traceback
 import numpy as np
 import pandas as pd
 
-from pipeline import ROOT, FEATURES, feature, fit_forecast, load, locate_data, pseudo, table
-from prayer_experiments import (fit_direct_variant, fit_forecast_variant,
-                                predict_direct_variant, predict_forecast_variant,
-                                timetable)
+from pipeline import ROOT, feature, load, locate_data, pseudo, table
 from v2_candidate import HF_WEIGHT, HIDDEN, MISSING_WEIGHT
 from v2_experiments import fit_direct, predict_hf
-from v3_prayer_candidate import PRAYER_FORECAST, PRAYER_HF_WEEKDAYS
+from t05_local_forecast import predict as predict_t05_forecast
 import v2_hidden
 import v2_missing
 
@@ -105,34 +102,25 @@ def load_cases():
     return cases, table(feed)
 
 
-def fit_fold(train, recordings, day, schedule):
+def fit_fold(train, day):
     fit = train[train.day.ne(day)]
     assert day not in set(fit.day)
     fit_tables = table(fit)
-    rec_day = recordings.set_index('recording').day.to_dict()
     return dict(
         hidden=v2_hidden.fit(fit_tables),
         direct=fit_direct(fit_tables),
-        direct_prayer=fit_direct_variant(fit_tables, rec_day, schedule, 'prayer')
-            if (('Sat' if day == DATES[1] else 'Fri') in PRAYER_HF_WEEKDAYS) else None,
-        forecast_prayer=fit_forecast_variant(fit_tables, rec_day, schedule, 'prayer')
-            if PRAYER_FORECAST else fit_forecast(fit_tables, 'log')[0],
         missing=v2_missing.fit_calibration(fit_tables))
 
 
-def predict_case(r, t, models, schedule):
+def predict_case(r, t, models, t05_values):
     unit = r.unit
     minute = int(r.minute)
     if r.kind == 'forecast':
         now = int(r.now); horizon = minute-now
         reference = feature(t, unit, now, horizon)[0]  # persistence
-        if PRAYER_FORECAST:
-            prediction = predict_forecast_variant(t, unit, now, horizon, r.day,
-                                                  schedule, models['forecast_prayer'], 'prayer')
-        else:
-            f = feature(t, unit, now, horizon)
-            residual = float(models['forecast_prayer'].predict(pd.DataFrame([f], columns=FEATURES))[0])
-            prediction = max(0., float(np.expm1(np.log1p(reference)+residual)))
+        model_value = t05_values[r.case_id]
+        source = 't05_model' if np.isfinite(model_value) else 'reference_fallback'
+        prediction = model_value if np.isfinite(model_value) else reference
     elif r.kind == 'hidden':
         reference = v2_hidden.predict(t, unit, minute, models['hidden'], 'single')[0]
         method, weight = HIDDEN[unit]
@@ -142,13 +130,8 @@ def predict_case(r, t, models, schedule):
         now = int(r.now); horizon = minute-now
         reference = predict_hf(t, unit, now, horizon, models['hidden'],
                                models['direct'], 'fixed')
-        weekday = 'Sat' if r.day == DATES[1] else 'Fri'
-        if weekday in PRAYER_HF_WEEKDAYS:
-            fitted = predict_direct_variant(t, unit, now, horizon, r.day,
-                                            schedule, models['direct_prayer'], 'prayer')
-        else:
-            fitted = predict_hf(t, unit, now, horizon, models['hidden'],
-                                models['direct'], 'direct')
+        fitted = predict_hf(t, unit, now, horizon, models['hidden'],
+                            models['direct'], 'direct')
         prediction = reference + HF_WEIGHT * (fitted-reference)
     else:
         reference = v2_missing.predict(t, unit, minute, models['missing'], 'linear')[0]
@@ -160,30 +143,33 @@ def predict_case(r, t, models, schedule):
                 t, unit, minute, models['missing'], method, weight)
             if np.isfinite(fitted) and gap >= 6 and available > 0:
                 prediction = fitted
+    if r.kind != 'forecast':
+        source = 'v2'
     if not (np.isfinite(reference) and np.isfinite(prediction) and prediction >= 0):
         raise RuntimeError(f'{r.case_id}: nonfinite reference or current prediction')
-    return float(reference), float(prediction)
+    return float(reference), float(prediction), source
 
 
-def make_predictions(train, recordings, cases, feeds, schedule):
+def make_predictions(train, cases, feeds):
     rows = []
-    checks = 0
+    t05_values, checks = predict_t05_forecast(cases, feeds)
     for day in DATES:
-        models = fit_fold(train, recordings, day, schedule)
+        models = fit_fold(train, day)
         today = cases[cases.day.eq(day)]
         for r in today.itertuples():
             t = feeds[r.recording]
-            reference, prediction = predict_case(r, t, models, schedule)
-            if r.kind in ('forecast', 'hidden-future'):
+            reference, prediction, source = predict_case(r, t, models, t05_values)
+            if r.kind == 'hidden-future':
                 # Forecasting paths must be invariant to all later camera data.
                 altered = t.copy()
                 altered.loc[altered.index > int(r.now)] = 1e6
-                ref2, pred2 = predict_case(r, altered, models, schedule)
+                ref2, pred2, _ = predict_case(r, altered, models, t05_values)
                 assert np.isclose(reference, ref2, rtol=0, atol=1e-10)
                 assert np.isclose(prediction, pred2, rtol=0, atol=1e-10)
                 checks += 1
             rows.append(dict(case_id=r.case_id, day=day, kind=r.kind,
-                             reference=reference, prediction=prediction))
+                             reference=reference, prediction=prediction,
+                             source=source))
         print(f'Fresh predictions for {day}: {len(today)}', flush=True)
     detail = pd.DataFrame(rows)
     assert len(detail) == len(cases) and detail.case_id.is_unique
@@ -210,21 +196,29 @@ def score(detail, checks):
     date_score = per_task.groupby('day').normalized_mae.mean().reset_index(name='date_score')
     date_score.to_csv(OUT / 'scores_by_date.csv', index=False)
     overall = float(date_score.date_score.mean())
-    report = dict(status='complete', local_score=overall, date_scores=date_score.to_dict('records'),
-                  total_predictions=len(scored), post_cutoff_checks=checks)
+    forecast_sources = scored.loc[scored.kind.eq('forecast'), 'source'].value_counts()
+    assert int(forecast_sources.sum()) == int(scored.kind.eq('forecast').sum()) == 2036
+    report = dict(status='complete', local_score=overall,
+                  forecast_method='T05 six-member GP with held-out 96-cell fit proxy',
+                  other_tasks_method='v2',
+                  date_scores=date_score.to_dict('records'),
+                  total_predictions=len(scored), post_cutoff_checks=checks,
+                  forecast_model_predictions=int(forecast_sources.get('t05_model', 0)),
+                  forecast_reference_fallbacks=int(forecast_sources.get('reference_fallback', 0)))
     (OUT / 'score.json').write_text(json.dumps(report, indent=2), encoding='utf-8')
     print(per_task.to_string(index=False))
     print(date_score.to_string(index=False))
+    print('T05 forecast model:', report['forecast_model_predictions'],
+          'reference fallback:', report['forecast_reference_fallbacks'])
     print(f'OVERALL LOCAL SCORE: {overall:.6f} (complete; {checks} post-cutoff checks)')
     return overall
 
 
 def main():
-    train, test, _, recordings = load(locate_data(None))
+    train, test, _, _ = load(locate_data(None))
     initialize_cases(train, test)
     cases, feeds = load_cases()
-    schedule = timetable(ROOT/'data/raw/prayer_times_madinah.csv', train, test)
-    detail, checks = make_predictions(train, recordings, cases, feeds, schedule)
+    detail, checks = make_predictions(train, cases, feeds)
     score(detail, checks)
 
 

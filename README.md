@@ -393,9 +393,12 @@ saved benchmark above exactly. The case and released-feed files contain no
 masked answers; `labels.csv` stores those separately and is read only after
 fresh predictions are saved. SHA-256 hashes guard these three files against
 later changes. Each run fits without the evaluated date and predicts anew
-using the current v2 hidden/missing selection and the current v3 prayer
-forecast/Saturday hidden-future selection. Forecast and hidden-future read
-camera values only through `now`, checked by perturbing all later values.
+using the T05 six-member forecast ensemble and the v2 hidden, hidden-future,
+and missing selections. For date-held-out T05 fitting, the command uses the
+teammate's fixed 96-cell validation proxy from the other test recording;
+the scored training day is excluded. The T05 prediction path uses only camera
+values through `now`; the v2 hidden-future predictions are also checked by
+perturbing all later values.
 The command does not write a Kaggle submission.
 
 For each date and task, normalized MAE is the model MAE divided by the local
@@ -405,9 +408,44 @@ interpolation for missing. The four ratios receive equal weight within each
 date; the two date scores receive equal weight overall. A failed task makes
 the result `incomplete` with a blocker instead of printing an overall score.
 
-The current complete **overall local score is 0.754722**, with date scores
-0.737605 (September 11) and 0.771840 (September 12), based on 3,719 fixed
-targets. The eight task/date results are in
+The current complete **overall local score is 0.799727**, with date scores
+0.799208 (September 11) and 0.800245 (September 12), based on 3,719 fixed
+targets. Of the 2,036 forecast targets, 703 received a T05 model prediction
+and 1,333 used the reference fallback. The previous v3 local score was
+0.754722 on the same fixed cases; it is saved as
+`outputs/local_score/prior_v3_score.json`. The eight current task/date results are in
 `outputs/local_score/scores_by_date_task.csv`; `scores_by_date.csv`,
 `predictions.csv`, `scored_predictions.csv`, and `score.json` are in the same
 directory. This local score is separate from all public Kaggle scores.
+
+## T05 forecast with v2 other tasks
+
+`scripts/run_t05_integrated.ps1` regenerates the v2 submission from the
+project's `src/v2_candidate.py` and the preserved v1 baseline, then fits or
+loads the T05 ensemble and predicts the forecast rows. It uses those fresh v2
+predictions for hidden, hidden-future, and missing. It writes
+`outputs/submission_t05_integrated.csv`, leaving the saved v2 and v3 submissions
+untouched. The exact T05 model settings are in `t05_forecast_config.json`;
+the model code is in `t05_forecast/`. PyTorch and SciPy are required alongside
+the existing dependencies. Fitted parameters are cached under
+`outputs/t05_cache/`; deleting that directory makes the next run refit them.
+
+From the project root in PowerShell, with the required packages installed in
+the selected Python environment:
+
+```powershell
+.\scripts\run_t05_integrated.ps1
+```
+
+Set `MADINAH_PYTHON` to a Python executable if it differs from the local
+Python 3.12 installation used by the other project scripts. Pass
+`--reference PATH` to compare every prediction by ID with the supplied T05
+submission, and `--t05-base PATH` to check the regenerated v2 values against
+the base file in the T05 package. The verification summary is written to
+`outputs/t05_integration_verification.json`.
+
+The integration run reproduced the v2 base exactly across 4,457 targets.
+Against the supplied T05 `submission.csv`, the maximum absolute difference
+was `4.3200998334214091e-12`, with zero differences above `1e-9` in every
+task. The package's `0.808` public Kaggle score is historical; this comparison
+only establishes numerical reproduction and is not a new Kaggle score.

@@ -54,7 +54,7 @@ def selected_validation():
     print(pd.read_csv(OUT/'v2_selected_scores_by_recording.csv').to_string(index=False))
 
 
-def build():
+def build(output_path: str | Path | None = None):
     train,test,sample,_=load(locate_data(None))
     original=OUT/'submission_v1_0.987.csv'
     if not original.exists():
@@ -103,7 +103,8 @@ def build():
             prediction=previous;method='reference'
         new_values[r.id]=str(max(0.,float(prediction))) if method!='reference' else old_values[r.id]
         methods[(r.kind,method)]+=1
-    path=OUT/'submission_v2.csv'
+    path=Path(output_path) if output_path else OUT/'submission_v2.csv'
+    path.parent.mkdir(parents=True,exist_ok=True)
     with path.open('w',newline='',encoding='utf-8') as f:
         writer=csv.DictWriter(f,fieldnames=['id','people'])
         writer.writeheader()
