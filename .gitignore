@@ -1,0 +1,22 @@
+.venv/
+.vendor/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+.env
+.env.*
+*.pem
+*.key
+
+# Competition inputs and generated artifacts stay local.
+data/
+outputs/
+/train.csv
+/test.csv
+/recordings.csv
+/sample_submission.csv
+/starter-notebook.ipynb
+/notebooks/starter-local.ipynb
+/notebooks/starter-executed.ipynb
