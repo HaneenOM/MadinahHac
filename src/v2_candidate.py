@@ -54,9 +54,10 @@ def selected_validation():
     print(pd.read_csv(OUT/'v2_selected_scores_by_recording.csv').to_string(index=False))
 
 
-def build(output_path: str | Path | None = None):
-    train,test,sample,_=load(locate_data(None))
-    original=OUT/'submission_v1_0.987.csv'
+def build(output_path: str | Path | None = None, *, data_dir=None,
+          reference_path=None, selection_path=None):
+    train,test,sample,_=load(Path(data_dir) if data_dir else locate_data(None))
+    original=Path(reference_path) if reference_path else OUT/'submission_v1_0.987.csv'
     if not original.exists():
         raise FileNotFoundError('The exact first submission is required for the combined candidate')
     with original.open(newline='',encoding='utf-8') as f:
@@ -119,11 +120,11 @@ def build(output_path: str | Path | None = None):
     changes=Counter(kinds[x['id']] for x in saved if x['people']!=old_values[x['id']])
     print('Submitted rows:',len(saved),'changed by kind:',dict(changes))
     print('Methods:',dict(methods))
-    (OUT/'v2_selection.json').write_text(json.dumps({
+    (Path(selection_path) if selection_path else OUT/'v2_selection.json').write_text(json.dumps({
         'hidden':HIDDEN,'hidden_future_direct_weight':HF_WEIGHT,
         'missing_weights':MISSING_WEIGHT,'missing_min_gap':6,
         'changed_by_kind':dict(changes),'methods':{str(k):v for k,v in methods.items()},
-        'first_submission':'submission_v1_0.987.csv'},indent=2))
+        'first_submission':original.name},indent=2))
 
 
 if __name__=='__main__':

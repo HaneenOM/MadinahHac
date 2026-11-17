@@ -1,0 +1,2 @@
+# Preserve the frozen assets and timetable hashes on every platform.
+models/current_baseline/** -text

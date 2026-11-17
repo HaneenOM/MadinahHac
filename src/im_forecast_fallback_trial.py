@@ -233,11 +233,12 @@ def run():
     print('Post-cutoff checks:', checks)
 
 
-def build_candidate():
+def build_candidate(*, data_dir=None, baseline_path=None, output_path=None, report_dir=None):
     """Fresh I-M predictions, preserving every other base value verbatim."""
-    _, test, sample, _ = load(locate_data(None))
+    from pathlib import Path
+    _, test, sample, _ = load(Path(data_dir) if data_dir else locate_data(None))
     protected = {p.name: digest(p) for p in (ROOT / 'outputs').glob('submission*.csv')}
-    base_path = ROOT / 'outputs/submission_t05_hidden_hidden_future_v1.csv'
+    base_path = Path(baseline_path) if baseline_path else ROOT / 'outputs/submission_t05_hidden_hidden_future_v1.csv'
     base = read_submission(base_path, sample.id.tolist())
     base_values = {r['id']: float(r['people']) for r in base}
     result = [r.copy() for r in base]
@@ -257,7 +258,7 @@ def build_candidate():
             output_by_id[r.id]['people'] = str(float(candidate))
             changed_rows.append(dict(id=r.id, day=r.day, unit=r.unit,
                                      absolute_difference=abs(candidate-base_values[r.id])))
-    path = ROOT / 'outputs/submission_t05_hidden_hidden_future_im_fallback_v1.csv'
+    path = Path(output_path) if output_path else ROOT / 'outputs/submission_t05_hidden_hidden_future_im_fallback_v1.csv'
     if path.exists():
         assert read_submission(path, sample.id.tolist()) == result, 'Existing candidate differs; preserve it'
     else:
@@ -272,13 +273,15 @@ def build_candidate():
                metadata.loc[r['id'], 'unit'] in UNITS for r in changes)
     assert all(digest(ROOT / 'outputs' / name) == value for name, value in protected.items())
     changed = pd.DataFrame(changed_rows)
-    changed.to_csv(OUT / 'candidate_changes.csv', index=False)
+    reports = Path(report_dir) if report_dir else OUT
+    reports.mkdir(parents=True, exist_ok=True)
+    changed.to_csv(reports / 'candidate_changes.csv', index=False)
     counts = changed.groupby(['day', 'unit']).size().reset_index(name='changed')
     report = dict(file=str(path), ids=len(saved), changed=len(changes),
                   changed_task='forecast', changed_units=sorted(changed.unit.unique()),
                   by_date_camera=counts.to_dict('records'),
                   all_preexisting_submissions_preserved=True)
-    (OUT / 'candidate_verification.json').write_text(json.dumps(report, indent=2), encoding='utf-8')
+    (reports / 'candidate_verification.json').write_text(json.dumps(report, indent=2), encoding='utf-8')
     print(f'Candidate: {path}; {len(saved)} IDs; only {len(changes)} I-M forecast values changed')
     print(counts.to_string(index=False))
 

@@ -16,15 +16,16 @@ from v2_experiments import fit_direct, predict_hf
 import v2_hidden
 
 
-def build(output_path: Path | None = None):
-    train, test, sample, recordings = load(locate_data(None))
+def build(output_path: Path | None = None, *, data_dir=None, baseline_path=None,
+          reference_path=None, timetable_path=None):
+    train, test, sample, recordings = load(Path(data_dir) if data_dir else locate_data(None))
     ids = sample.id.tolist()
     out = ROOT / 'outputs'
-    base = read_submission(out / 'submission_t05_hidden_v1.csv', ids)
+    base = read_submission(Path(baseline_path) if baseline_path else out / 'submission_t05_hidden_v1.csv', ids)
     base_values = {r['id']: float(r['people']) for r in base}
-    v1 = read_submission(out / 'submission_v1_0.987.csv', ids)
+    v1 = read_submission(Path(reference_path) if reference_path else out / 'submission_v1_0.987.csv', ids)
     reference = {r['id']: float(r['people']) for r in v1}
-    schedule = timetable(ROOT / 'data/raw/prayer_times_madinah.csv', train, test)
+    schedule = timetable(Path(timetable_path) if timetable_path else ROOT / 'data/raw/prayer_times_madinah.csv', train, test)
     fit_tables = table(train)
     hidden = v2_hidden.fit(fit_tables)
     direct = fit_direct(fit_tables)

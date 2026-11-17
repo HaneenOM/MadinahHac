@@ -32,13 +32,14 @@ def read_submission(path: Path, sample_ids: list[str]) -> list[dict[str, str]]:
     return rows
 
 
-def build(output_path: Path | None = None):
-    train, test, sample, _ = load(locate_data(None))
+def build(output_path: Path | None = None, *, data_dir=None, baseline_path=None,
+          reference_path=None):
+    train, test, sample, _ = load(Path(data_dir) if data_dir else locate_data(None))
     sample_ids = sample.id.tolist()
-    baseline_path = ROOT / 'outputs' / 'submission_t05_integrated.csv'
+    baseline_path = Path(baseline_path) if baseline_path else ROOT / 'outputs' / 'submission_t05_integrated.csv'
     baseline = read_submission(baseline_path, sample_ids)
     base_by_id = {r['id']: r['people'] for r in baseline}
-    v1 = read_submission(ROOT / 'outputs' / 'submission_v1_0.987.csv', sample_ids)
+    v1 = read_submission(Path(reference_path) if reference_path else ROOT / 'outputs' / 'submission_v1_0.987.csv', sample_ids)
     reference = {r['id']: float(r['people']) for r in v1}
     models = v2_hidden.fit(table(train))
     released = table(test[test.id.isna() & test.people.notna()])

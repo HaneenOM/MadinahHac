@@ -7,13 +7,86 @@ starter is preserved as `notebooks/starter-official.ipynb`.
 
 ## Collaborator setup
 
+### Current accepted baseline: one notebook
+
+Open **`notebooks/current_baseline.ipynb`** for the accepted T05-based pipeline
+whose historical public Kaggle score was **0.806 (user reported)**. This is
+the teammate entry point; the older commands and experiment sections below
+document the project's history.
+
+After cloning, run from the repository root in PowerShell:
+
+```powershell
+py -3.12 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+```
+
+Place the authorized competition `train.csv`, `test.csv`, `recordings.csv`,
+and `sample_submission.csv` in `data/raw/`. Open the notebook in VS Code,
+select `.venv\Scripts\python.exe` as its Python kernel, and choose **Run All**.
+Alternatively, execute that same notebook without a notebook editor:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\run_current_baseline_notebook.py
+```
+
+The new output is `outputs/current_baseline/submission_current_baseline.csv`.
+`verification.json`, `run.log`, and (for the command above)
+`current_baseline_executed.ipynb` are in the same directory. The original
+notebooks and submissions are preserved. Every run generates fresh predictions.
+
+The accepted path includes T05 forecast, the accepted I–M fallback, the accepted
+hidden donor/Ridge weights, Saturday prayer hidden-future, and v2 missing.
+**The separate nonlinear D-only candidate is disabled.** No rejected experiment,
+diagnostic evaluation, hyperparameter search, or T05 retraining runs here.
+
+Reproducibility dependencies previously missing from a clone are now supplied in
+`models/current_baseline/`: the twelve small accepted T05 parameter sets, the
+supplied prayer timetable, and a manifest of hashes and numerical package
+versions. These parameter files contain fitted covariance parameters, not raw
+competition observations or submission predictions. The required reference for
+the other three tasks is recovered directly from the official sample: the first
+submission retained those exact sample values. No previous submission or local
+`outputs/t05_cache` is required. Optional path arguments were added to the accepted
+builders without changing their prediction formulas or default commands.
+
+The notebook checks the four input hashes, frozen assets, all 4,457 sample IDs in
+order, unique IDs, and finite nonnegative predictions. It requires the final
+SHA-256 to match the accepted fingerprint in the manifest. If the local saved
+`outputs/submission_t05_hidden_hidden_future_im_fallback_v1.csv` exists, it also
+compares every value by ID and the file hash. A mismatch stops the notebook;
+cross-platform numerical differences are not silently accepted as an exact
+reproduction. The raw competition inputs and all generated outputs remain
+ignored by Git; commit the new notebook, source changes, and model assets before
+the teammate clones this setup. No commit or push is performed by the notebook.
+
+The tracked timetable is the supplied September 2026 timetable from
+<https://www.noor-deen.com/prayer-times/medina/>, timezone `Asia/Riyadh`.
+Its Dhuhr entry is a scheduled timetable reference, without assuming a sermon
+or iqama time. The baseline notebook uses this frozen copy, so an additional
+local timetable download is unnecessary.
+
+Verified locally on November 17, 2026: Run All took 82.35 seconds, generated
+4,457 valid rows, and had **zero unequal values by ID** against the saved
+0.806 reference (maximum absolute difference **0**). Both files have SHA-256
+`c7e0a0785fee013449b30a1041abdf939a58461bb5f359c5294e69b2c8ec6cd5`.
+A second execution from a clean source export containing only repository
+source/assets plus the four authorized raw inputs also matched that fingerprint
+in 50.53 seconds, with no old submissions, local model cache, or untracked
+experiment scripts present. Both executions used the installed pinned numerical
+dependencies; a fresh network installation into a new environment was not run.
+No T05 model was refitted. The verification reports are respectively
+`outputs/current_baseline/verification.json` and
+`outputs/current_baseline_clean_checkout/outputs/current_baseline/verification.json`.
+
 The repository tracks source code, PowerShell benchmark commands, dependencies,
-documentation, and the official starter notebook. Competition CSVs, the local
-prayer timetable, generated notebooks, benchmark results, and submissions are
-ignored by Git. After cloning, place `train.csv`, `test.csv`,
-`recordings.csv`, `sample_submission.csv`, and `prayer_times_madinah.csv` in
-`data/raw/` from the authorized local copies. Keep any Kaggle submission files
-in `outputs/` locally.
+documentation, frozen baseline model assets, and the official starter notebook.
+Raw competition CSVs, local prayer timetable copies, executed notebooks,
+benchmark results, and submissions are
+ignored by Git. After cloning, place the four competition CSVs in `data/raw/`
+from the authorized local copies. For the legacy experiment commands below,
+also place `prayer_times_madinah.csv` there; the new baseline notebook instead
+uses its bundled timetable. Keep any Kaggle submission files in `outputs/` locally.
 
 ## Run on Windows PowerShell
 
