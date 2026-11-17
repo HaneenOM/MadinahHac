@@ -1377,3 +1377,108 @@ remain unchanged, as do all existing submissions, verified with SHA-256.
 `design.json`, `fit_manifest.json`, `verification.json`, prediction files,
 `fixed_*` and `additional_*` reports preserve the experiment and every
 recording/camera/window MAE, normalization, coverage and omitted-window result.
+
+### Prompt 27: Saturday D-only hidden candidate (locally accepted)
+
+Run `powershell -ExecutionPolicy Bypass -File .\scripts\run_hidden_d_candidate.ps1`.
+The runner is separate from production and saves its benchmark under
+`outputs/hidden_d_candidate/`. It reproduces the existing nonlinear trial
+settings without tuning, keeps B/G and all other tasks on their current methods,
+and writes `outputs/submission_t05_hidden_d_only_v1.csv` only after the checks
+pass. An identical existing candidate is verified/reused without writing; a
+differing existing candidate is never overwritten. `--resume` can finish from
+verified completed predictions; `--report-only` regenerates per-recording
+omitted-window diagnostics without fitting or predicting.
+
+The D result was reproduced within 1e-9 using the unchanged Prompt 26 code,
+75-tree settings, features, dropout and minimum-two-visible-donor fallback.
+Every evaluated date is completely excluded from fitting and preprocessing;
+Sep 5 excludes all three recordings together. Replacing every hidden D value
+throughout each evaluation recording leaves features and predictions unchanged.
+No new scope, time gate, feature, parameter or blend was selected from Sep 12
+errors: Saturday D-only was specified by the user before this run.
+
+| Held-out recording | Cases / 30-min windows | Current MAE | D-only MAE | Current normalized | D-only normalized |
+|---|---:|---:|---:|---:|---:|
+| Sep 12 11:00 | 283 / 20 | 7.227049 | 4.804217 | 0.934333 | 0.621103 |
+| Sep 5 04:26 | 41 / 7 | 9.158452 | 9.719344 | 1.001437 | 1.062768 |
+| Sep 5 11:24 | 24 / 5 | 6.357324 | 5.562904 | 1.011673 | 0.885253 |
+| Sep 5 19:00 | 24 / 5 | 9.490766 | 6.829160 | 0.921416 | 0.663012 |
+
+Normalized errors use the same-case reference MAE separately for every
+recording/window. New-model coverage is 282/283, 31/41, 24/24 and 24/24,
+respectively; the other cases retain current predictions. D improves 16/20
+primary windows. Leaving out every window of EACH recording gives gain ranges
+(current MAE minus candidate MAE): Sep 12 +2.116 to +2.678; Sep 5 midday
++0.240 to +1.730; evening +1.253 to +3.762; morning -1.176 to -0.006.
+Thus the principal gain is not a single-window result and repeats at midday
+and evening, while the morning regression remains real. These dates have
+already been examined: this is NOT a fresh independent test, and small
+auxiliary groups and shared crowd events limit confidence.
+
+The actual Sep 19 hidden-D audit reads target metadata ONLY, never hidden
+people values. All 285 targets are between 11:00 and 21:14. All fall in
+evaluated Sep 12 time blocks: 216 map to the 16 improving blocks, 69 to the
+four regressing blocks; none is temporally uncovered. Counts by clock hour
+11 through 21 are 30,30,30,30,25,23,25,27,29,21,15. No actual target falls
+in the regressing Sep 5 04:26-08:00 period; 54 overlap its improving midday
+period and 65 its improving evening period. These are temporal coverage
+comparisons, not claims about Sep 19 target accuracy. There is no new
+morning exclusion rule. Exact visible-input coverage is 284/285; one target
+keeps the protected baseline.
+
+The full benchmark generated fresh current predictions for all 3,719 fixed
+cases once, with T05 fit-cache access strictly load-only. Its baseline matches
+the existing saved predictions within 1e-9 and reproduces 0.7818975063504505.
+The candidate replaces only the 283 fixed Saturday hidden-D predictions with
+the reproduced nonlinear outputs; other predictions/references are identical.
+Both full runs use the unchanged `local_score.score` function, byte-identical
+scoring labels and the same date/task weighting. Predictions and reports are
+in separate `full_baseline/` and `full_candidate/` directories; original
+benchmark files remain untouched.
+
+| Local metric (lower is better) | Current | D-only candidate |
+|---|---:|---:|
+| Forecast normalized task score | 0.856771 | 0.856771 |
+| Hidden normalized task score | 0.895612 | 0.738997 |
+| Hidden-future normalized task score | 0.618158 | 0.618158 |
+| Missing normalized task score | 0.757049 | 0.757049 |
+| Overall local score | 0.781897506 | 0.742743705 |
+| Pooled hidden MAE, 843 cases | 5.313369 | 4.500010 |
+
+The overall local change is -0.039153801. Task scores above are equal-date
+means of each task's normalized error, rather than pooled ratios. Friday
+hidden B/G is unchanged. All three other task scores are exactly unchanged.
+The user-reported 0.806 public Kaggle score belongs to the protected prior
+submission and is not comparable numerically to this local score; the new
+candidate has no public result and no expected Kaggle score is claimed.
+
+Submission verification uses the ACTUAL existing production formula: the
+saved v1 reference blended with fitted D Ridge at the current weight. Local
+held-out validation instead rebuilds its reference inside each training fold.
+The proxy reference is not substituted into the production comparison. All
+285 protected D predictions were reproduced with the production formula to
+1e-9 before replacement; the one insufficient-input case retains its original
+protected text value. This distinction required a verification fix, not a
+model change or retuning. Completed full predictions were reused to finish
+verification; T05 was not rerun or retrained during that finish step.
+
+The new CSV has exactly `id,people`, all 4,457 unique IDs in sample order and
+finite nonnegative predictions. Exactly 284 rows change, all hidden Saturday
+D; the other 4,172 rows, including every B/G, forecast, hidden-future and
+missing value, are EXACTLY equal as text to the protected 0.806 file. The
+remaining D fallback is also text-identical. Every previous submission and
+production source is preserved; no upload, commit or push was performed.
+
+Recommendation: accept as a separate locally validated D-only candidate,
+while retaining the production baseline. The morning regression, 69 real
+targets in previously regressing blocks, repeated use of known validation
+dates and small auxiliary recordings remain limitations. Computation was
+about half a minute: approximately 18.2 seconds for reproduction/full scoring,
+6.2 seconds for the finish/verification stage and about two seconds for the
+additional recording sensitivity report. No T05 model was fitted. The run
+checks 372 historical D masks, 285 actual D masks and 2,518 full-benchmark
+forecast cutoffs; fixed data, source and prior artifacts are SHA-256 protected.
+`D_by_*`, `D_recording_leave_one_window_out.csv`, `actual_D_time_audit.csv`,
+`full_task_comparison.csv`, `full_score_comparison.csv` and `verification.json`
+contain the full audit. `files_changed.txt` lists the exact new/modified files.
