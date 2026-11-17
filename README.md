@@ -677,3 +677,76 @@ submissions retain their SHA-256 hashes. All 13,590 cutoff checks pass
 saved as `candidate_verification.json`; rerunning checks an existing
 candidate rather than overwriting it. Suggested commit message:
 `Add recency-gated median fallback candidate for I-M forecasts`.
+
+## A-H missing correction median trial (rejected)
+
+```powershell
+.\scripts\run_missing_targeted_trial.ps1
+```
+
+The current complete local benchmark was rerun and reproduced
+**0.7818975063504505**. The experiment reuses the 358 fixed missing targets
+from September 11 and 12, with exactly the same released feed and reference.
+Each evaluated date is excluded from calibration. Predictions are saved
+before reading the separate labels; all 358 baseline values match the
+current v2 predictions within 1e-9. Files are in
+`outputs/missing_targeted_trial/`.
+
+V2 starts with time-aware endpoint interpolation. For gaps of at least six
+minutes, it applies a calibrated donor correction on A/B/C/E/F/G when useful
+donors are available. Pair slopes are trained on historical deviation
+windows, retaining pairs whose training absolute error improves. It averages
+up to four donors using their training improvements as weights, limits the
+correction to half the interpolated count (minimum scale 5), and uses the
+camera weight: A/B/C/E/G 1.0, F 0.5, D/H 0.0. D/H, short gaps and unavailable
+donors retain interpolation. Donor deviations are anchored to both observed
+ends of the gap.
+
+The fixed targets represent 38 distinct outages: 17 Friday and 21 Saturday.
+Baseline MAE by camera is A 9.904 (6 outages), B 2.323 (3), C 3.469 (6),
+D 4.205 (3), E 8.354 (6), F 6.853 (5), G 1.447 (3), and H 2.872 (6).
+Largest outage totals come from Friday A 16:26-16:42 (15 masked minutes,
+MAE 16.570), Friday E 20:05-20:19 (13, 12.447), Friday A 19:06-19:18
+(11, 10.660), and Saturday E 16:29-16:38 (8, 13.352). The largest individual
+error is Saturday E at minute 993, 31.994 people.
+
+For descriptive grouping, a sharp observed change means the range of the
+target's released counts in the five minutes around both endpoints is at
+least max(10, 50% of the endpoints' mean). No hidden count enters this flag.
+The binary flag is a relative threshold; high absolute changes can remain
+below it at high crowd levels. Group coverage and baseline error:
+
+| Gap length | Sharp | Target minutes | Distinct outages | v2 MAE |
+|---|---|---:|---:|---:|
+| 1-5 | No | 5 | 1 | 0.874 |
+| 6-10 | No | 142 | 18 | 4.761 |
+| 6-10 | Yes | 54 | 7 | 6.132 |
+| 11-20 | No | 107 | 8 | 3.650 |
+| 11-20 | Yes | 50 | 4 | 9.658 |
+
+Several large errors coincided with isolated donor-correction spikes:
+Friday A minute 1051 had a +27.482 correction when interpolation error was
+only 2.010. One targeted alternative therefore takes the median of the v2
+correction at minute-1, minute and minute+1, adds it to the unchanged linear
+trend, and retains the v2 correction limits. Corrections at both observed
+endpoints are zero; all 76 endpoint checks pass. Calibration, camera weights,
+and masks are identical; no alternative settings were searched.
+
+| Held-out date | Targets / outages | v2 MAE | Median trial MAE | v2 normalized | Trial normalized |
+|---|---:|---:|---:|---:|---:|
+| Sep 11 | 163 / 17 | 6.549358 | 7.151343 | 0.761470 | 0.831460 |
+| Sep 12 | 195 / 21 | 4.191951 | 4.173008 | 0.752627 | 0.749226 |
+
+Friday has 5 improved, 6 regressed and 6 unchanged outages. Saturday has
+9 improved, 9 regressed and 3 unchanged. Saturday's total absolute-error
+gain is only 3.694; its best outage alone (E 16:29-16:38) contributes
+18.596, so excluding it reverses the gain to a loss of 14.902. The largest
+Friday regression is E 20:05-20:19, MAE 12.447 to 18.744. Median filtering
+also removes useful rapid donor movement, so this experiment is rejected.
+
+`candidate_scores.csv` gives date/camera scores; `candidate_by_outage.csv`
+shows the concentration of gains; `outages.csv`, `by_length_sharp.csv`, and
+`largest_errors.csv` provide the diagnosis. Production code and all saved
+submissions are unchanged (SHA-256 checked). The retained combined candidate
+is `outputs/submission_t05_hidden_hidden_future_im_fallback_v1.csv`; the
+complete local score remains 0.781898. No missing candidate CSV is generated.
