@@ -1168,3 +1168,102 @@ cutoff/history checks plus template perturbation and cached-prediction
 agreement checks, and verified SHA-256 preservation of fixed data, predictions,
 T05 source and existing submissions. `design.json`, prediction/history traces,
 all grouped errors, and `verification.json` preserve the audit.
+
+### Prompt 25: independent nonlinear A-H forecast (rejected)
+
+Run `powershell -ExecutionPolicy Bypass -File .\scripts\run_independent_forecast_trial.ps1`.
+`--prepare` performs only the feasibility/feature check. A saved plan is reused
+only if its protected inputs/source and prepared feature hashes still match;
+otherwise prepare again before evaluating. Reports are saved in
+`outputs/independent_forecast_trial/`. The protected production predictor and
+`submission_t05_hidden_hidden_future_im_fallback_v1.csv` remain unchanged.
+Its 0.806 public Kaggle score is user-reported and historical; no expected
+Kaggle score is inferred here.
+
+Feasibility passed before training: six training recordings on Sep 4, 5, 11
+and 12 supply 6,523 eligible examples at 63 nonoverlapping forecast origins;
+both evaluated dates are later than all training recordings. Fixed cases
+and cached fully isolated T05 predictions match exactly by metadata/IDs.
+The new model uses no template, no T05 prediction, and no T05 error as an
+input or target, so there is no indirect template completion path to leak
+the evaluated recording. No T05 fit or inference was run in this experiment.
+
+One installed sklearn HistGradientBoostingRegressor predicts the change in
+log1p count from the latest own-camera reading. Its 55 features cover own
+recent readings/means/slopes/age/count, A-H levels/slopes/availability/ages,
+camera, horizon, clock/weekday and supplied scheduled prayer-relative times
+at now and target. Prayer data is the existing local timetable; it is not
+a sermon/iqama or crowd-motion timestamp. All recording-time reads are
+explicitly sliced through `now` before aggregates. Missing features use
+native NaN splits plus availability, age and point-count indicators. Only
+an own reading no older than five minutes is required for eligibility.
+
+Hyperparameters were fixed before evaluation: absolute-error loss, 100
+iterations, learning rate 0.05, at most 15 leaves and depth 4, minimum leaf
+size 40, L2=10, early stopping disabled, seed 25. Training weights give each
+camera/origin equal total weight across its horizons. Predicted log change
+is bounded by the 99.5th training percentile of absolute change. There was
+one fit, one evaluation pass, no tuning and no blend selection. Preprocessing,
+subgroup thresholds and output bounds use training observations/labels only.
+Recent and actual-request predictions were saved before evaluation labels
+were joined for scoring.
+
+| Date | Eligible / fixed cases | Origins | Isolated T05 MAE | Independent model MAE |
+|---|---:|---:|---:|---:|
+| Sep 18 | 403 / 752 | 9 | 16.402953 | 25.958044 |
+| Sep 19 | 531 / 814 | 9 | 10.590168 | 18.447945 |
+
+The independent model wins five Friday origins and one Saturday origin, but
+large losses outweigh those wins. Leaving out every origin in turn still
+leaves it worse on both dates: T05-minus-independent MAE gain ranges from
+-11.381 to -6.281 Friday and -9.071 to -3.809 Saturday. A/E/F regress
+substantially on both dates; Friday D improves from 4.795 to 3.887 over 58
+targets/seven origins, which does not justify selecting a camera-specific
+replacement after looking at evaluation errors.
+
+| Date | Horizon | Targets / origins | T05 MAE | Independent MAE |
+|---|---|---:|---:|---:|
+| Sep 18 | 1-5 | 194 / 9 | 16.547 | 22.375 |
+| Sep 18 | 6-10 | 149 / 7 | 18.409 | 27.558 |
+| Sep 18 | 11-15 | 60 / 4 | 10.956 | 33.570 |
+| Sep 19 | 1-5 | 237 / 9 | 9.751 | 10.053 |
+| Sep 19 | 6-10 | 185 / 7 | 10.962 | 19.137 |
+| Sep 19 | 11-15 | 109 / 4 | 11.784 | 35.532 |
+
+Long-horizon groups have only four origins and are flagged sparse. Known-at-now
+movement groups use the training 75th percentile absolute 10-minute log slope
+(0.040515/minute), requiring three points spanning five minutes. Saturday
+rapid rises regress 22.187 to 50.526 (78 targets, only two origins). Saturday
+rapid falls improve slightly, 4.024 to 3.938 (30 targets/four origins); Friday
+rapid falls are essentially unchanged, 3.749 to 3.844 (26/three). No eligible
+Friday rapid-rise group exists at this prespecified threshold. Quieter groups
+also worsen. A separate scorer-only abrupt-future-change diagnostic, using
+the training 90th percentile absolute log change (0.668230), shows T05 versus
+independent MAE 64.723 versus 113.713 Friday (30/four origins), and 28.347
+versus 75.402 Saturday (66/five). Future change is NEVER used as a feature,
+eligibility criterion, model-selection input or application gate.
+
+Limited recent context (fewer than three observations or a span under five
+minutes in the last ten) is a distribution mismatch: only 15 training cases,
+but 206 of 934 eligible evaluation cases. Their MAEs regress 14.769 to
+35.731 Friday and 10.759 to 19.906 Saturday. Even on the richer context that
+resembles actual requests, the model loses: 16.886 to 23.067 on 311 Friday
+cases/eight origins and 10.544 to 18.049 on 417 Saturday/eight origins.
+All 2,105 real A-H forecast requests have eligible rich context and could
+receive independent predictions; all would differ from the protected file.
+This is applicability, not an expected accuracy improvement. Pseudo cases
+contain no released Friday B/G or Saturday D target answers; gains for those
+camera/day combinations cannot be validated. Only two recent recording
+dates are available, and multiple camera targets share each crowd event.
+
+Decision: reject replacement and do not recommend an untested blend. No
+candidate submission was created. Both dates fail the prespecified >=3%
+gain, leave-one-origin-out robustness and camera-regression criteria.
+The two commands (feasibility plus fit/evaluation) took about 8.3 seconds
+including startup: 2.06 seconds feature preparation plus 1.79 seconds
+training/evaluation inside Python. There was one HGB fit and zero T05 fits.
+All 10,210 feature-cutoff perturbation checks passed; SHA-256 checks confirm
+that raw data, fixed cases/labels, cached predictions, T05/production source
+and saved submissions are unchanged. `plan.json`, `verification.json`,
+`by_{date,camera,horizon,window,movement,context,actual_change}.csv`, every
+leave-one-window-out result and label-free predictions preserve the trial.
