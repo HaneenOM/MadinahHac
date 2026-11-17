@@ -528,3 +528,60 @@ and changes only 162 September 19 hidden-future values. All 484 base
 hidden-future rows were reproduced from the v2 method within 1e-9 before
 building it. The historical **0.808 public Kaggle score** belongs to the
 original T05 submission, not this local candidate.
+
+## Friday early-arrival hypothesis (local experiment)
+
+Run ` .\scripts\run_friday_arrival_trial.ps1 ` from the project root. Results
+are saved in `outputs/friday_arrival_trial/`: `scores.csv`,
+`observed_patterns.csv`, `predictions.csv`, `scored.csv`, and
+`verification.json`. The current full baseline was rerun and reproduced
+**0.7818975063504505**. The Friday experiment is not adopted; Saturday
+prayer features and all production prediction paths remain as before.
+
+The prespecified candidate adds only `now - Friday Dhuhr` and
+`target - Friday Dhuhr` to the v2 direct features (NaN on non-Friday
+training rows). Dhuhr is the supplied local timetable reference, not an
+observed sermon, iqama, or movement time: 12:21 on September 4 and 12:18 on
+September 11. Training rows, targets, estimator parameters, reference, and
+75% direct blend match v2. Each evaluated date is entirely excluded from
+fitting. B and G are masked together. Predictions are saved before scoring;
+the count-pattern analysis runs only after prediction and scoring. All 406
+post-cutoff checks pass (322 fixed September 11 cases plus 84 September 4
+cases). SHA-256 checks confirm every saved submission is unchanged.
+
+| Date | Camera | Targets | v2 MAE | Candidate MAE | v2 normalized | Candidate normalized |
+|---|---|---:|---:|---:|---:|---:|
+| Sep 11 | B | 164 | 5.161389 | 5.456324 | 0.639326 | 0.675858 |
+| Sep 11 | G | 158 | 2.533940 | 2.596658 | 0.802937 | 0.822810 |
+| Sep 11 | Both | 322 | 3.872144 | 4.053134 | 0.684085 | 0.716061 |
+| Sep 4 | B | 56 | 7.334129 | 6.270531 | 0.585430 | 0.500531 |
+| Sep 4 | G | 28 | 4.728633 | 4.497429 | 1.172519 | 1.115190 |
+
+Window boundaries are target-minus-Dhuhr in [-90,-60), [-60,-30), and
+[-30,0); all remaining times are outside. Per-camera/window MAE,
+normalized errors and zero-count windows are included in `scores.csv`.
+September 11 has no targets in the earliest window, 15 per camera in
+30-60 minutes, and only one per camera in 0-30 minutes. Outside these
+windows, B regresses 5.437018 to 5.802020 (148 cases), and G regresses
+2.635686 to 2.700984 (142). The early B gain is insufficient overall.
+September 4 was already used in the earlier v3 prayer experiment, so its
+improvement is not fresh independent validation. Its 84 cases have no
+60-90 minute targets either.
+
+Observed mean counts (observation counts in parentheses), computed after
+the paired prediction run:
+
+| Date | Camera | 60-90 min before | 30-60 min before | 0-30 min before |
+|---|---|---:|---:|---:|
+| Sep 11 | B | 18.801 (18) | 13.949 (30) | 10.639 (30) |
+| Sep 11 | G | 9.373 (18) | 8.114 (30) | 7.620 (30) |
+| Sep 4 | B | 17.099 (5) | 15.065 (30) | 8.704 (30) |
+| Sep 4 | G | unavailable (0) | 5.542 (10) | 5.547 (30) |
+
+The earliest window is partial: September 11 covers only 78-61 minutes
+before Dhuhr; September 4 B covers only 65-61 minutes. September 4 G starts
+40 minutes before Dhuhr. Later windows are complete except that G 30-60
+window. These readings show no consistent count rise approaching Dhuhr.
+Counts in a camera view alone cannot establish the direction of movement
+toward the mosque. The limited coverage and conflicting held-out results
+support retaining the current Friday method and full local score 0.781898.
