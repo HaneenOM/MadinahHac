@@ -481,3 +481,50 @@ is present or absent. Some small high-crowd groups regress (B: 28 targets in
 `outputs/submission_t05_hidden_v1.csv` from the verified integrated submission;
 it reproduced the baseline hidden rows within 1e-9 and changed 569 of 849
 hidden predictions, leaving every other task identical.
+
+## Saturday hidden-future prayer trial
+
+The timetable source and schema are documented above. `timetable()` validates
+six unique dates, `HH:MM` values, and joins preserving all 13,443 training
+and 8,611 test rows. The paired experiment reuses the 482 fixed cases and
+separate labels, excludes the evaluated date from fitting, and changes only
+the direct model's prayer features. Both variants use the same training
+examples, estimator settings, 75% blend, and reference. The existing direct
+features already contain clock minute and horizon; the clock control adds
+only the Friday flag. The prayer variant adds signed minutes to the nearest
+scheduled prayer at `now` and the target, plus a prayer-between flag. Camera
+inputs are cut off at `now`; all 482 trial invariance checks pass.
+
+```powershell
+$env:PYTHONPATH = (Resolve-Path .).Path + [IO.Path]::PathSeparator + (Join-Path (Resolve-Path .).Path '.vendor'); py -3.12 src\hidden_future_prayer_trial.py
+.\scripts\run_local_score.ps1
+$env:PYTHONPATH = (Resolve-Path .).Path + [IO.Path]::PathSeparator + (Join-Path (Resolve-Path .).Path '.vendor'); py -3.12 src\hidden_future_prayer_candidate.py
+```
+
+The trial saves predictions before reading labels. Its files are in
+`outputs/hidden_future_prayer_trial/`. Local held-out results:
+
+| Date | Targets | v2 MAE / normalized | Clock MAE / normalized | Prayer MAE / normalized |
+|---|---:|---:|---:|---:|
+| Sep 11 Friday | 322 | 3.872 / 0.684085 | 3.838 / 0.678079 | 3.918 / 0.692174 |
+| Sep 12 Saturday | 160 | 6.445 / 0.647585 | 6.666 / 0.669832 | 5.496 / 0.552231 |
+
+Within 15 minutes of a scheduled prayer, Friday has 64 targets (v2 MAE
+3.170, prayer 2.993) and Saturday has 30 (v2 6.287, prayer 4.704).
+Outside those windows, Friday has 258 (v2 4.046, prayer 4.147) and
+Saturday has 130 (v2 6.481, prayer 5.679). The earlier v3 exploration
+also evaluated September 5 Saturday: prayer improved the 11:24 recording
+(37 targets, 7.961 to 5.209 MAE) and the 19:00 recording (29 targets,
+7.628 to 7.586). Those recordings were already used to choose the prayer
+features, so they are supportive but not independent validation.
+
+The current local benchmark applies prayer features to Saturday
+hidden-future only. Its score is **0.781898**, versus **0.793817** before
+this change (lower is better); Saturday hidden-future normalized error is
+0.552231 versus 0.647585, while Friday remains 0.684085. The candidate
+`outputs/submission_t05_hidden_hidden_future_v1.csv` is built from
+`submission_t05_hidden_v1.csv`; it contains all 4,457 IDs in sample order
+and changes only 162 September 19 hidden-future values. All 484 base
+hidden-future rows were reproduced from the v2 method within 1e-9 before
+building it. The historical **0.808 public Kaggle score** belongs to the
+original T05 submission, not this local candidate.

@@ -13,6 +13,7 @@ from pipeline import ROOT, feature, load, locate_data, pseudo, table
 from v2_candidate import HF_WEIGHT, MISSING_WEIGHT
 from hidden_candidate import HIDDEN_CANDIDATE
 from v2_experiments import fit_direct, predict_hf
+from prayer_experiments import fit_direct_variant, predict_direct_variant, timetable
 from t05_local_forecast import predict as predict_t05_forecast
 import v2_hidden
 import v2_missing
@@ -103,17 +104,21 @@ def load_cases():
     return cases, table(feed)
 
 
-def fit_fold(train, day):
+def fit_fold(train, day, schedule):
     fit = train[train.day.ne(day)]
     assert day not in set(fit.day)
     fit_tables = table(fit)
-    return dict(
+    models = dict(
         hidden=v2_hidden.fit(fit_tables),
         direct=fit_direct(fit_tables),
         missing=v2_missing.fit_calibration(fit_tables))
+    if day == '2026-09-12':
+        rec_day = fit.drop_duplicates('recording').set_index('recording').day.to_dict()
+        models['prayer_direct'] = fit_direct_variant(fit_tables, rec_day, schedule, 'prayer')
+    return models
 
 
-def predict_case(r, t, models, t05_values):
+def predict_case(r, t, models, t05_values, schedule):
     unit = r.unit
     minute = int(r.minute)
     if r.kind == 'forecast':
@@ -131,8 +136,12 @@ def predict_case(r, t, models, t05_values):
         now = int(r.now); horizon = minute-now
         reference = predict_hf(t, unit, now, horizon, models['hidden'],
                                models['direct'], 'fixed')
-        fitted = predict_hf(t, unit, now, horizon, models['hidden'],
-                            models['direct'], 'direct')
+        if r.day == '2026-09-12':
+            fitted = predict_direct_variant(t, unit, now, horizon, r.day,
+                                            schedule, models['prayer_direct'], 'prayer')
+        else:
+            fitted = predict_hf(t, unit, now, horizon, models['hidden'],
+                                models['direct'], 'direct')
         prediction = reference + HF_WEIGHT * (fitted-reference)
     else:
         reference = v2_missing.predict(t, unit, minute, models['missing'], 'linear')[0]
@@ -151,20 +160,20 @@ def predict_case(r, t, models, t05_values):
     return float(reference), float(prediction), source
 
 
-def make_predictions(train, cases, feeds):
+def make_predictions(train, cases, feeds, schedule):
     rows = []
     t05_values, checks = predict_t05_forecast(cases, feeds)
     for day in DATES:
-        models = fit_fold(train, day)
+        models = fit_fold(train, day, schedule)
         today = cases[cases.day.eq(day)]
         for r in today.itertuples():
             t = feeds[r.recording]
-            reference, prediction, source = predict_case(r, t, models, t05_values)
+            reference, prediction, source = predict_case(r, t, models, t05_values, schedule)
             if r.kind == 'hidden-future':
                 # Forecasting paths must be invariant to all later camera data.
                 altered = t.copy()
                 altered.loc[altered.index > int(r.now)] = 1e6
-                ref2, pred2, _ = predict_case(r, altered, models, t05_values)
+                ref2, pred2, _ = predict_case(r, altered, models, t05_values, schedule)
                 assert np.isclose(reference, ref2, rtol=0, atol=1e-10)
                 assert np.isclose(prediction, pred2, rtol=0, atol=1e-10)
                 checks += 1
@@ -202,7 +211,7 @@ def score(detail, checks):
     report = dict(status='complete', local_score=overall,
                   forecast_method='T05 six-member GP with held-out 96-cell fit proxy',
                   hidden_method='v2 donor model, B weight 0.75, D weight 0.50',
-                  other_tasks_method='v2 hidden-future and missing',
+                  other_tasks_method='Saturday prayer hidden-future, Friday v2 hidden-future, v2 missing',
                   date_scores=date_score.to_dict('records'),
                   total_predictions=len(scored), post_cutoff_checks=checks,
                   forecast_model_predictions=int(forecast_sources.get('t05_model', 0)),
@@ -218,9 +227,10 @@ def score(detail, checks):
 
 def main():
     train, test, _, _ = load(locate_data(None))
+    schedule = timetable(ROOT / 'data/raw/prayer_times_madinah.csv', train, test)
     initialize_cases(train, test)
     cases, feeds = load_cases()
-    detail, checks = make_predictions(train, cases, feeds)
+    detail, checks = make_predictions(train, cases, feeds, schedule)
     score(detail, checks)
 
 
