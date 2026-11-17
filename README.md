@@ -393,8 +393,8 @@ saved benchmark above exactly. The case and released-feed files contain no
 masked answers; `labels.csv` stores those separately and is read only after
 fresh predictions are saved. SHA-256 hashes guard these three files against
 later changes. Each run fits without the evaluated date and predicts anew
-using the T05 six-member forecast ensemble and the v2 hidden, hidden-future,
-and missing selections. For date-held-out T05 fitting, the command uses the
+using the T05 six-member forecast ensemble, the tested hidden B/D blend, and
+the v2 hidden-future and missing selections. For date-held-out T05 fitting, the command uses the
 teammate's fixed 96-cell validation proxy from the other test recording;
 the scored training day is excluded. The T05 prediction path uses only camera
 values through `now`; the v2 hidden-future predictions are also checked by
@@ -408,11 +408,13 @@ interpolation for missing. The four ratios receive equal weight within each
 date; the two date scores receive equal weight overall. A failed task makes
 the result `incomplete` with a blocker instead of printing an overall score.
 
-The current complete **overall local score is 0.799727**, with date scores
-0.799208 (September 11) and 0.800245 (September 12), based on 3,719 fixed
+The current complete **overall local score is 0.793817**, with date scores
+0.793990 (September 11) and 0.793644 (September 12), based on 3,719 fixed
 targets. Of the 2,036 forecast targets, 703 received a T05 model prediction
-and 1,333 used the reference fallback. The previous v3 local score was
-0.754722 on the same fixed cases; it is saved as
+and 1,333 used the reference fallback. The integrated T05 + v2 baseline
+scored 0.799727 on these same cases; its results are saved as
+`prior_t05_v2_score.json` and `prior_t05_v2_scores_by_date_task.csv` in the
+same directory. The earlier v3 local score was 0.754722 and is saved as
 `outputs/local_score/prior_v3_score.json`. The eight current task/date results are in
 `outputs/local_score/scores_by_date_task.csv`; `scores_by_date.csv`,
 `predictions.csv`, `scored_predictions.csv`, and `score.json` are in the same
@@ -449,3 +451,33 @@ Against the supplied T05 `submission.csv`, the maximum absolute difference
 was `4.3200998334214091e-12`, with zero differences above `1e-9` in every
 task. The package's `0.808` public Kaggle score is historical; this comparison
 only establishes numerical reproduction and is not a new Kaggle score.
+
+## Hidden B/D blend trial
+
+Run the one-change held-out experiment with:
+
+```powershell
+$env:PYTHONPATH = (Resolve-Path .).Path + [IO.Path]::PathSeparator + (Join-Path (Resolve-Path .).Path '.vendor'); py -3.12 src\hidden_blend_trial.py
+```
+
+It reuses `outputs/local_score/cases.csv` and `released_feed.csv`, fits v2
+without the evaluated date, saves predictions, and only then reads the separate
+labels. The baseline weights are 0.50 for B and G (dropout Ridge) and 0.25 for
+D (ordinary Ridge). The trial changes B to 0.75 and D to 0.50; G stays at
+0.50. The result by held-out camera was:
+
+| Date and camera | Targets | Baseline MAE | Candidate MAE | Baseline normalized | Candidate normalized |
+|---|---:|---:|---:|---:|---:|
+| Sep 11 B | 284 | 6.004 | 5.795 | 0.860873 | 0.830938 |
+| Sep 11 G | 276 | 2.856 | 2.856 | 0.916672 | 0.916672 |
+| Sep 12 D | 283 | 7.431 | 7.227 | 0.960740 | 0.934333 |
+
+The trial outputs include predictions, date/camera scores, donor availability,
+crowd-level groups, and the 20 largest baseline errors in
+`outputs/hidden_blend_trial/`. B and D improve whether their preferred donor
+is present or absent. Some small high-crowd groups regress (B: 28 targets in
+51–100; D: 6 targets in 51–100). The complete local score improves by
+0.005910. `src/hidden_candidate.py` generates
+`outputs/submission_t05_hidden_v1.csv` from the verified integrated submission;
+it reproduced the baseline hidden rows within 1e-9 and changed 569 of 849
+hidden predictions, leaving every other task identical.

@@ -10,7 +10,8 @@ import numpy as np
 import pandas as pd
 
 from pipeline import ROOT, feature, load, locate_data, pseudo, table
-from v2_candidate import HF_WEIGHT, HIDDEN, MISSING_WEIGHT
+from v2_candidate import HF_WEIGHT, MISSING_WEIGHT
+from hidden_candidate import HIDDEN_CANDIDATE
 from v2_experiments import fit_direct, predict_hf
 from t05_local_forecast import predict as predict_t05_forecast
 import v2_hidden
@@ -123,7 +124,7 @@ def predict_case(r, t, models, t05_values):
         prediction = model_value if np.isfinite(model_value) else reference
     elif r.kind == 'hidden':
         reference = v2_hidden.predict(t, unit, minute, models['hidden'], 'single')[0]
-        method, weight = HIDDEN[unit]
+        method, weight = HIDDEN_CANDIDATE[unit]
         fitted = v2_hidden.predict(t, unit, minute, models['hidden'], method)[0]
         prediction = reference + weight * (fitted-reference)
     elif r.kind == 'hidden-future':
@@ -200,7 +201,8 @@ def score(detail, checks):
     assert int(forecast_sources.sum()) == int(scored.kind.eq('forecast').sum()) == 2036
     report = dict(status='complete', local_score=overall,
                   forecast_method='T05 six-member GP with held-out 96-cell fit proxy',
-                  other_tasks_method='v2',
+                  hidden_method='v2 donor model, B weight 0.75, D weight 0.50',
+                  other_tasks_method='v2 hidden-future and missing',
                   date_scores=date_score.to_dict('records'),
                   total_predictions=len(scored), post_cutoff_checks=checks,
                   forecast_model_predictions=int(forecast_sources.get('t05_model', 0)),
