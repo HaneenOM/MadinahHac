@@ -1076,3 +1076,95 @@ saved. The successful command took about 3.6 seconds including startup
 (1.56 seconds inside the script), fit one primary and two small stress Ridge
 folds, fit zero T05 members, passed 20,681 future-perturbation feature checks,
 and verified SHA-256 preservation of submissions, fixed files and T05 source.
+
+### Prompt 24: causal online forecast bias correction (rejected)
+
+Run `powershell -ExecutionPolicy Bypass -File .\scripts\run_online_bias_trial.ps1`.
+Results are in `outputs/online_bias_trial/`. No production predictor or existing
+submission is modified. The protected 0.806 Kaggle score is user-reported and
+historical; the following numbers are local MAEs, not Kaggle score estimates.
+
+One rule was fixed before evaluation labels were read: add half the median
+of the same camera's eligible errors from the preceding 90 minutes, requiring
+at least ten distinct released target timestamps and two original forecast
+origins. Cap its magnitude at max(1 person, 10% of that camera's median count
+on eligible training recordings). The 90-minute memory spans three intervals
+of the existing 30-minute diagnostic grid. No thresholds, shrinkage, caps or
+memory were selected using Sep 18/19 errors; no second rule or search was run.
+Older stress caps exclude the evaluated training date.
+
+Earlier forecasts are reconstructed exactly at their original cutoffs with
+load-only cached parameters. All 1,566 clean and frozen recent predictions
+match the saved diagnostic to absolute tolerance 1e-9. The clean baseline
+excludes each evaluated recording directly and from fitting-template
+completion; it is an isolation control, not a replacement for production
+parameters. Frozen production-style past predictions are used only to
+estimate actual-request correction coverage/application.
+
+At each current `now`, the history reader first takes the released recording
+prefix strictly BEFORE `now`. A past error requires
+`past_origin < past_target < current_now`, the original cell status RELEASED,
+a finite reading, the same recording and camera, and a finite causal T05
+prediction. No masked hidden label or future target is used. Previously scored
+pseudo targets can contribute later only because their ORIGINAL recording
+status is RELEASED and their timestamp has already passed. Error histories
+are read from released data, never from the evaluation labels file. Saved
+per-row traces include past IDs, count, origins and latest eligible target
+timestamp. Predictions are saved before joining separate scoring labels.
+
+| Date / subset | Targets | Origins | Unchanged isolated T05 MAE | Bias-corrected MAE |
+|---|---:|---:|---:|---:|
+| Sep 18 all | 752 | 16 | 20.402136 | 20.894802 |
+| Sep 18 corrected | 492 | 12 | 21.041859 | 21.794877 |
+| Sep 18 fallback | 260 | 6 | 19.191584 | 19.191584 |
+| Sep 19 all | 814 | 15 | 14.354977 | 14.867586 |
+| Sep 19 corrected | 454 | 10 | 16.725226 | 17.644308 |
+| Sep 19 fallback | 360 | 8 | 11.365830 | 11.365830 |
+
+All subsets compare identical targets. A clock-origin window can contain both
+corrected and fallback cameras, so subset window counts need not sum to the
+all-case count. Friday improves in six of sixteen windows, Saturday in four
+of fifteen. Leave-one-window-out gain (T05 MAE minus corrected MAE) ranges
+from -0.626 to -0.178 Friday and -0.813 to +0.028 Saturday. Thus the losses
+are not rescued by a stable gain across windows.
+
+| Date | Horizon | Targets / origins | T05 MAE | Corrected MAE |
+|---|---|---:|---:|---:|
+| Sep 18 | 1-5 | 242 / 11 | 20.076 | 20.310 |
+| Sep 18 | 6-10 | 262 / 10 | 20.053 | 20.945 |
+| Sep 18 | 11-15 | 248 / 11 | 21.090 | 21.412 |
+| Sep 19 | 1-5 | 282 / 11 | 11.726 | 12.786 |
+| Sep 19 | 6-10 | 273 / 11 | 14.955 | 15.448 |
+| Sep 19 | 11-15 | 259 / 10 | 16.585 | 16.522 |
+
+Camera A regresses 43.284 to 44.775 Friday and 31.754 to 34.546 Saturday;
+E regresses on both dates too. Small gains for Friday C/D and Saturday B/C/F
+do not offset these losses. Detailed per-camera and independent-origin
+tables, including corrected/fallback splits, are in `recent_by_camera.csv`
+and `recent_by_window.csv`; every leave-one-window-out value is saved.
+These nonoverlapping forecast target windows are not independent recording
+replicates, and the correction itself intentionally carries past information
+across windows. Only two recent recording dates are available, with no
+released Friday B/G or Saturday D answers.
+
+The older fixed benchmark's forecast targets remain permanently absent from
+its masked feed, so they must NOT become calibration errors later. Instead,
+1,499 additional past forecasts were reconstructed ONLY for actually released
+feed cells, using existing sample-96 T05 parameters and the original template
+settings; no fit was run. Results are reported separately: Sep 11, 936 targets
+(816 corrected), MAE 37.231374 to 39.124251; Sep 12, 1,100 (942 corrected),
+17.281041 to 17.735700. Historical template coverage and the benchmark's
+30-minute fallback limit interpretation; older scores are not pooled with
+recent-date scores.
+
+Decision: reject this rule. Both recent dates and both older stress dates
+regress. Of the 2,105 real A-H forecast requests, 1,853 have sufficient earlier
+released errors and would change; 252 fall back unchanged. This coverage uses
+the existing sparse diagnostic prediction schedule, not an invented stream
+of every-minute forecasts. A denser or shorter-memory history would be a
+different experiment and was not tuned here. No candidate submission was
+created. The run took 70.8 seconds, fitted zero T05 models, passed 24,097
+cutoff/history checks plus template perturbation and cached-prediction
+agreement checks, and verified SHA-256 preservation of fixed data, predictions,
+T05 source and existing submissions. `design.json`, prediction/history traces,
+all grouped errors, and `verification.json` preserve the audit.
