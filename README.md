@@ -994,3 +994,85 @@ submission was generated and zero submission rows were changed. The run took
 22.2 seconds, fitted zero models, passed 9,396 member/cutoff checks and template
 perturbation checks, and verified SHA-256 preservation of existing submissions,
 fixed cases, labels and saved weekly predictions. See `verification.json`.
+
+### Prompt 23: bounded short-term change model (rejected)
+
+Run `powershell -ExecutionPolicy Bypass -File .\scripts\run_short_term_change_trial.ps1`.
+Reports are in `outputs/short_term_change_trial/`. Production prediction code
+and every saved submission remain unchanged. The protected submission is
+`outputs/submission_t05_hidden_hidden_future_im_fallback_v1.csv`, with a
+user-reported historical public Kaggle score of 0.806. No Kaggle score is
+predicted by this experiment.
+
+T05 already conditions on cross-camera observations; the new hypothesis is a
+different response function for short-term change, not additional camera
+information. One Ridge model predicts `(target - latest)/training_camera_scale`
+using 18 horizon-scaled own-camera features: level, 3/10-minute and last-pair
+slopes, reading age/interval, short-context availability, time sin/cos, Friday,
+and camera offsets. Its standardized mean-loss L2 penalty is 0.1, fixed without
+evaluation-label tuning. Six eligible training recordings on four dates give
+6,508 examples in 63 nonoverlapping target windows. Camera scales are training
+medians; the 99th training quantile of absolute per-minute normalized change
+bounds the predicted change. A prespecified 25% blend with T05 caps its
+innovation using the corresponding 95th training quantile. There is no model
+search or blend-weight tuning. Rapid rise/fall groups use the training 75th
+quantile of absolute normalized 10-minute slope (0.041155/minute), not future
+target changes.
+
+Eligibility requires an own-camera reading no older than five minutes and
+at least three readings over a span of five minutes within the last ten.
+Recent cases and labels are unchanged. Only 311/752 Friday and 417/814 Saturday
+fixed cases qualify, each covering eight distinct 30-minute origins with
+nonoverlapping 1-15 minute target windows. Cached clean T05 predictions from
+the weekly diagnostic exclude each evaluation recording both directly and
+through fitting-template completion. These isolated-fit baseline scores differ
+from the frozen production cache; production is not replaced. The change
+model fits only the six released training recordings, never Sep 18/19. Every
+feature reads a recording prefix ending at `now`; evaluation labels are joined
+only after recent, older and actual-request predictions have been saved.
+
+| Date | Cases / windows | Isolated T05 MAE | Change model MAE | Bounded blend MAE |
+|---|---:|---:|---:|---:|
+| Sep 18 | 311 / 8 | 16.886214 | 24.663127 | 16.619071 |
+| Sep 19 | 417 / 8 | 10.544087 | 21.121632 | 12.626780 |
+
+The blend improves Friday by 0.267 people (1.58%) but worsens Saturday by
+2.083 (19.75%). Friday wins four of eight windows; leaving out each window
+gives gains from -0.571 to +1.137, so the gain is not robust. Saturday wins
+five small windows but loses heavily at 20:15 (91 cases, blend MAE 33.491
+versus 24.475); its leave-one-window-out gain stays negative, -2.497 to
+-0.147. Camera F on Friday regresses 19.067 to 22.516; Saturday A/E regress
+28.006 to 34.512 and 19.375 to 25.362. Saturday horizons 6-10 regress
+11.039 to 13.419; 11-15 regress 13.059 to 18.822 (only three origins).
+
+| Date / known-at-now movement | Cases / windows | T05 MAE | Change MAE | Blend MAE |
+|---|---:|---:|---:|---:|
+| Sep 18 rapid rise | 4 / 1 | 13.572 | 3.523 | 11.997 |
+| Sep 18 rapid fall | 38 / 4 | 3.389 | 4.102 | 3.212 |
+| Sep 18 quieter | 269 / 8 | 18.842 | 27.882 | 18.582 |
+| Sep 19 rapid rise | 67 / 4 | 3.497 | 4.468 | 3.680 |
+| Sep 19 rapid fall | 34 / 4 | 4.503 | 4.945 | 4.429 |
+| Sep 19 quieter | 316 / 8 | 12.688 | 26.393 | 15.406 |
+
+Rapid movement groups have at most four origins and the Friday rise group
+only four examples, so they cannot establish a general improvement. These
+are categories of recent observed movement, not labels of future rises/falls.
+Separate older stress folds exclude the entire evaluated training date from
+Ridge fitting and use the saved masked observation feed and T05 predictions:
+Sep 11 (925 eligible, 11 origins), T05/change/blend MAE
+37.622657/45.845940/38.279161; Sep 12 (1,100, 11 origins),
+17.281041/19.832240/16.548677. Older T05 template/model coverage is limited;
+its fallback is preserved. The older results are not pooled with Sep 18/19.
+
+Decision: reject. The approach fails the prespecified requirement of at least
+1% gain on both recent dates, positive gain after leaving out every window,
+at least three winning windows/day, and no major camera/horizon regression
+greater than max(1 person, 10% of baseline MAE). All 2,105 actual A-H forecast
+requests have eligible input context and would change under the tested blend,
+but this is coverage, not evidence of improved accuracy. No submission was
+created. Features/predictions, per-date/camera/horizon/movement/window MAEs,
+all leave-one-window-out results, training manifest and frozen design are
+saved. The successful command took about 3.6 seconds including startup
+(1.56 seconds inside the script), fit one primary and two small stress Ridge
+folds, fit zero T05 members, passed 20,681 future-perturbation feature checks,
+and verified SHA-256 preservation of submissions, fixed files and T05 source.
