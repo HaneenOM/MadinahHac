@@ -1,0 +1,14 @@
+{
+  "source_kind": "User-supplied competition-specific rule, P39; attachment corroborates same verbatim text",
+  "source_path": "C:\\Users\\96655\\Downloads\\Pasted markdown(1).md",
+  "source_sha256": "bbbbd25e14b971b1133cf01558b36c258fd52359c05279ddbce9b54a4e3645e3",
+  "rule_text": "For a forecast or hidden-future gap, use no row from after its `now`: not the rest of that recording, nor later recordings of the same day. Models may be trained on any released row, including rows after a gap’s now; only the inputs used for that gap are limited. Hidden and missing gaps may use the whole released table.",
+  "independently_retrieved_from_kaggle": false,
+  "permissions": {
+    "fitting": "Any genuinely released rows, including rows later than a gap cutoff",
+    "forecast_hidden_future_inputs": "Only rows no later than own now; no later recording that day",
+    "hidden_missing_inputs": "Whole released table"
+  },
+  "official_scoring_formula": "not supplied; project-specific local normalization only",
+  "template_interpretation": "Trace complete_template coefficients and historical donor basis; do not treat an arbitrary future-derived table as training. P39 candidate uses no T05 template."
+}

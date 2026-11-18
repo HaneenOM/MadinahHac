@@ -7,6 +7,39 @@ starter is preserved as `notebooks/starter-official.ipynb`.
 
 ## Collaborator setup
 
+### Friday-only HIDDEN candidate (PROMPT 40)
+
+[The P40 report](reports/prompt40_friday_hidden_ar.md) documents a separate
+candidate changing only 280 Friday HIDDEN G rows. A small date-held-out
+development comparison selected released-row dropout Ridge with Friday fitting
+weight 3 and the existing 0.5 G blend. B stays unchanged because development did
+not consistently support a replacement. Fixed Friday G MAE improves 1.61% in
+the strict benchmark and 1.25% in the separate release-matched setting, including
+positive gains after removing the two best windows. These already-examined
+dates provide limited evidence, not a predicted Kaggle score.
+
+`outputs/prompt40_friday_hidden/submission_friday_hidden_v1.csv` is separate from
+the protected baseline and D-only candidate. All 4,177 other text values,
+including every Saturday row, are unchanged. Nothing is enabled in production
+or the default notebook; no automatic Kaggle upload is performed.
+
+### Released-row fitting rule and one bounded audit (PROMPT 39)
+
+The user supplied the competition-specific rule permitting model fitting on
+any genuinely released row, including after a gap's now; forecast/hidden-future
+observation inputs still stop at each own now. Hidden/missing may use the whole
+released table. This does not establish an official scoring formula.
+See [the P39 audit and experiment](reports/prompt39_released_training_ar.md).
+Production already uses released test information in T05 fitting/template
+completion; the older statement below about no fitting on test is historical.
+The three other production task fitters receive train only.
+
+One separate HIDDEN experiment added released A–H rows to the existing Ridge
+family, with unchanged features/settings/blends. It was rejected: Friday
+improved, Saturday worsened under both strict date-held-out and a distinct
+globally masked release-matched protocol. No candidate submission was generated,
+and no production/notebook/model-asset changes or T05 refits were made.
+
 ### Local evaluation: supported commands (PROMPT 38)
 
 Use [the documented evaluation protocol](docs/local_evaluation.md) and
