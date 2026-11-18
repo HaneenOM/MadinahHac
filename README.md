@@ -7,6 +7,43 @@ starter is preserved as `notebooks/starter-official.ipynb`.
 
 ## Collaborator setup
 
+### Forecast-tree stopping reassessment (PROMPT 50)
+
+[The P50 Arabic report](reports/prompt50_forecast_reselection_ar.md) confirms
+P49's 1/30/15 were valid fitted-round counts, not an indexing error. A bounded
+reselection used template-covered released September 11/12 targets, excluding
+all fixed historical answers and all September 18/19 data from selection.
+All three algorithms selected one round; recent performance did not improve.
+Selection remains small and lacks E, and historical dates are reused although
+assessment targets stay separate. No candidate or default change was made.
+Runner: `scripts/forecast_tree_reselection.py`; curves and split audits are
+under `outputs/prompt50_forecast_reselection/`. P49 assets remain unchanged.
+
+### Shared-feature FORECAST tree comparison (PROMPT 49)
+
+[The P49 Arabic report](reports/prompt49_forecast_trees_ar.md) compares actual
+CatBoost, LightGBM and XGBoost fits using identical isolated weekly-template,
+recent-deviation and cross-camera features. LightGBM improved the historical
+stress test but regressed on both representative dates. XGBoost's Friday-D
+signal remains exploratory, with contradictory older evidence and limited
+assessment coverage of higher actual counts. No submission was created.
+Development early stopping used September 4/5 only, where weekly features were
+unavailable; this materially limits the comparison. All 0.800 defaults remain
+unchanged. Separate runner: `scripts/forecast_tree_trial.py`; features:
+`src/forecast_tree_features.py`; dependencies: `requirements-forecast-trees.txt`.
+
+### Zero-shot Chronos FORECAST trial (PROMPT 48, not adopted)
+
+[The P48 Arabic report](reports/prompt48_chronos_forecast_ar.md) records an actual
+CPU run of Chronos-Bolt Small in an isolated environment, preserving NaNs on
+the minute grid and every request's cutoff. It regressed against isolated T05
+on both representative dates and the historical stress test; I-M proxy gains
+for M did not survive removal of its two best windows. No submission was made.
+The accepted 0.800 notebook, HIDDEN B/G/D recipes and other tasks are unchanged.
+Runner: `scripts/chronos_forecast_trial.py`; separate dependencies:
+`requirements-chronos.txt`. No T05 refit was performed. See the report for
+coverage, legacy covariance provenance, pinned model revision and commands.
+
 ### Endpoint-preserving MISSING Hermite trial (PROMPT 46, rejected)
 
 [The P46 Arabic report](reports/prompt46_missing_hermite_ar.md) documents local

@@ -1,0 +1,16 @@
+{
+  "seed":49,
+  "maximum_rounds":400,
+  "early_stopping_rounds":40,
+  "threads":4,
+  "learning_rate":0.04,
+  "catboost":{"depth":5,"l2_leaf_reg":10,"loss_function":"MAE","nan_mode":"Min"},
+  "lightgbm":{"max_depth":5,"num_leaves":31,"min_child_samples":30,"reg_lambda":10,"objective":"regression_l1","use_missing":true,"zero_as_missing":false},
+  "xgboost":{"max_depth":5,"min_child_weight":30,"reg_lambda":10,"objective":"reg:absoluteerror","tree_method":"hist"},
+  "target":"count - anchor; anchor is weekly template count when available, otherwise latest own observed count",
+  "training":"one shared dataset per outer date-held-out fold; released train plus released test, excluding entire assessment date",
+  "selection":"two date-held-out development folds on September 4/5 only; median best round, no configuration search",
+  "template":"lam=.8; earlier train dates of same weekday, prefer long; coefficients from other eligible long train recordings; exclude own date and outer assessment date",
+  "availability":"same-camera last observation within 5 minutes; otherwise unchanged isolated T05 fallback",
+  "im":"unsupported, retain current predictor; no trained I-M history"
+}
