@@ -7,6 +7,18 @@ starter is preserved as `notebooks/starter-official.ipynb`.
 
 ## Collaborator setup
 
+### Endpoint-preserving MISSING Hermite trial (PROMPT 46, rejected)
+
+[The P46 Arabic report](reports/prompt46_missing_hermite_ar.md) documents local
+exterior-tangent cubic Hermite with a monotonicity limiter, distinct from Ridge
+gap-shape learning and donor-correction smoothing. Settings were selected on
+71 synthetic gaps from September 4/5 only, reserving both fixed evaluation dates.
+A/C had training support but their frozen blend increased fixed MAE from
+5.265296 to 5.415497 overall, including regressions on both dates and after
+removing the two best gaps. No candidate submission was created; I-M and the
+accepted 0.800 defaults remain unchanged. Isolated implementation/runner:
+`src/missing_hermite.py` and `src/missing_hermite_trial.py`.
+
 ### Current baseline: 0.800, user-reported public score (PROMPT 45)
 
 `notebooks/current_baseline.ipynb` now defaults to the exact uploaded BGD method:
