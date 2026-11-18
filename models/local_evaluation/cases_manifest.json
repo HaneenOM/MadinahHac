@@ -1,0 +1,14 @@
+{
+  "historical": {
+    "cases": "e857d7ad88583de4ea3c7cd5180cb666cae9b44e50cf483f5fc5e35e5c6dca30",
+    "labels": "02657e5225bb34bdbfced8041c0c1281e33b5c0063f5080c04b5f54190134764"
+  },
+  "representative": {
+    "cases": "9a11a341cfbc14b4db3eab2e53fcf11fd3c47295ce7888cb5b8b1676795394dc",
+    "labels": "f0ab4b62b039301a408b17771932fbf5f7928c82232f2ccfa34ab924ed3737fa"
+  },
+  "im-proxy": {
+    "cases": "2d8d2d07ed80d70df7650895137a668b8f6838d8df6bc661106aaf5b699f8e9a",
+    "labels": "2bad27967b9d74cbb620c1be09f44363105e77507d0f8a8a3a64508de905e32e"
+  }
+}

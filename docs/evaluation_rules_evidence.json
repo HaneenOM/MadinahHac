@@ -1,0 +1,62 @@
+{
+  "checked_on": "2026-11-18",
+  "official_starter": {
+    "path": "notebooks\\starter-official.ipynb",
+    "sha256": "cf92fbe46bd09438c483b1e3aea3ac40dd491db4b3f24807e98ee85141084325",
+    "cells": [
+      {
+        "cell_index": 0,
+        "cell_id": "a5ed2ac6",
+        "type": "markdown",
+        "text": "# The crowd table with holes: starter\n\nLoads the data, fits one small model for the forecast holes (gradient boosting on what each unit showed up to `now`),\nkeeps the sample submission (the reference baselines, which score 1) for the other kinds, and writes `/kaggle/working/submission.csv`. It needs no internet.\nWorks on the camera table and on the H3 plaza tables alike: a row is a unit and a minute."
+      },
+      {
+        "cell_index": 2,
+        "cell_id": "1bd36097",
+        "type": "markdown",
+        "text": "## One table per recording\n\nMinutes down, units across, people where released (a hole or a blank minute is NaN)."
+      },
+      {
+        "cell_index": 4,
+        "cell_id": "2fbe32d2",
+        "type": "markdown",
+        "text": "## Features known at `now`\n\nFor each unit: its last value (5 minutes back at most), its mean over the last 15 minutes, the whole table's mean over\nthe last 5 minutes (all as logs) and the horizon. Nothing after `now`."
+      },
+      {
+        "cell_index": 5,
+        "cell_id": "e5bdedf4",
+        "type": "code",
+        "text": "def features(t, now, H):\n    a = t.loc[now - 15:now].to_numpy(float)\n    last = np.full(a.shape[1], np.nan)\n    for row in a[-6:]:\n        last = np.where(np.isfinite(row), row, last)\n    with np.errstate(all=\"ignore\"):\n        mean15 = np.nanmean(a, 0)\n        table = np.nanmean(np.log1p(a[-6:]))\n    X = pd.DataFrame({\"log_last\": np.log1p(last), \"log_mean15\": np.log1p(mean15), \"log_table\": table, \"horizon\": float(H)},\n                     index=t.columns)\n    return X\n\nX, y = [], []\nfor rec, t in T_train.items():\n    t.attrs[\"rec\"] = rec\n    for now in t.index[20:-5:3]:\n        for H in (5, 15, 30):\n            if now + H not in t.index:\n                continue\n            f = features(t, now, H)\n            target = np.log1p(t.loc[now + H].to_numpy(float)) - f[\"log_last\"].to_numpy()\n            ok = np.isfinite(target)\n            X.append(f[ok]); y.append(target[ok])\nX, y = pd.concat(X), np.concatenate(y)\nmodel = HistGradientBoostingRegressor(loss=\"absolute_error\", max_iter=200, learning_rate=0.05, random_state=0)\nmodel.fit(X, y, sample_weight=np.maximum(np.expm1(X[\"log_last\"]), 1.0))\nprint(f\"forecast model on {len(y):,} training rows\")"
+      },
+      {
+        "cell_index": 6,
+        "cell_id": "f967226d",
+        "type": "markdown",
+        "text": "## Predict the forecast holes, keep the reference for the rest"
+      }
+    ]
+  },
+  "retrieval_attempts": [
+    {
+      "url": "https://www.kaggle.com/competitions/MDA-Ethical-AI-KAUST-Academy/overview/evaluation",
+      "result": "No readable evaluation text returned by web reader"
+    },
+    {
+      "url": "https://www.kaggle.com/competitions/MDA-Ethical-AI-KAUST-Academy/rules",
+      "result": "No readable rule text returned by web reader"
+    }
+  ],
+  "confirmed": [
+    "Starter: forecast input features no later than now",
+    "Starter: last reading within five minutes",
+    "Starter: unavailable cells stay NaN",
+    "Starter: sample references score 1"
+  ],
+  "unconfirmed": [
+    "Official normalization formula",
+    "Official aggregation weights",
+    "Detailed input availability for hidden, hidden-future, missing",
+    "Permission to fit templates/covariances on released other-test-recording observations"
+  ],
+  "caveat": "Local reconstruction code and previous reports are not official rule evidence; no public/private date assignment inferred."
+}

@@ -46,19 +46,16 @@ def masked_recording(original, feed, targets):
     return rec
 
 
-def heldout_params(recs, heldout, member):
-    """Fit/cache T05's fixed 96-cell validation proxy without heldout labels."""
-    other, prior = FIT_SOURCE[heldout]
-    assert heldout not in (other, prior)
-    source = recs[other]
-    tmpl = build_template(source, [recs[prior]], lam=member['lam'])
-    field = gp.observed(source, tmpl, slope(tmpl), clip=1.5)
-    if len(field['t']) < 96:
-        raise RuntimeError(f'T05 fitting source {other} has only {len(field["t"])} usable cells')
-    pick = np.linspace(0, len(field['t']) - 1, 96, dtype=int)
-    sample = {k: field[k][pick] for k in ('t', 'c', 'd', 'r')}
-    key = f'heldout_{heldout}_sample96_{member["key"]}'
-    return fit_cached(OUT / 't05_fit_cache', key, [sample], **fit_kwargs(member))
+def heldout_params(recs, heldout, member, *, allow_legacy_provenance=False):
+    """Load only after compatibility checks; NEVER optimize on a cache miss.
+
+    Old scripts must explicitly acknowledge incomplete legacy provenance.
+    Use reliable_evaluation.py for the supported evaluation workflow.
+    """
+    from evaluation_artifacts import validated_entries,ASSETS
+    from t05_forecast.pipeline import load_params
+    entries=validated_entries('historical',allow_legacy_provenance)
+    return load_params(ASSETS/'historical'/entries[heldout,member['key']]['filename'])
 
 
 def predict(cases, feeds):

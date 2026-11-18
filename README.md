@@ -7,6 +7,24 @@ starter is preserved as `notebooks/starter-official.ipynb`.
 
 ## Collaborator setup
 
+### Local evaluation: supported commands (PROMPT 38)
+
+Use [the documented evaluation protocol](docs/local_evaluation.md) and
+`src/reliable_evaluation.py` for new evaluations. It separates the fixed
+September 11–12 low-prior-week-coverage stress test, the fixed September 18–19
+released-target A–H diagnostic, and the overlapping I–M proxy. It runs current
+task implementations, never optimizes T05, and reports coverage and paired
+reference MAE separately. The project aggregate is **not confirmed as the
+official Kaggle metric**; missing official rule text is explicitly listed.
+
+`models/local_evaluation/` bundles 24 small evaluation covariances separately
+from production. Their original training provenance is incomplete. Forecast
+runs require `--allow-legacy-provenance` and remain labeled conditional; input,
+code, settings, reconstructed field and asset fingerprints are checked before
+reuse. Without the flag, with changed fingerprints, or with missing assets the
+run stops. No automatic 12-model refit occurs. The old full-score command and
+experiment commands below are historical records, not the recommended workflow.
+
 ### Current accepted baseline: one notebook
 
 Open **`notebooks/current_baseline.ipynb`** for the accepted T05-based pipeline

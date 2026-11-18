@@ -1,0 +1,1401 @@
+{
+  "schema": 1,
+  "context_at_import": {
+    "inputs": {
+      "recordings.csv": "8fbed52f0ceda78fa5445c91c8ae15697284082d264190e2603bc20a141f72e9",
+      "sample_submission.csv": "22e1d6a23de7095c18be2e1e2d8dfbccaaa4010e647feee608e10f16ee798471",
+      "test.csv": "6f2c6400b02964f3f37b912a5d6dbe085b28e7070a8094bdfad918e57766e6b9",
+      "train.csv": "3210a0b33212a60a888977848ec09f5f89bc0954bfd3b88e61fb9d840537f6f6"
+    },
+    "gp_code": {
+      "src/evaluation_artifacts.py": "00868bb0862f75ec200cef2faf259c8ae7e47f5c57e404c8dd4b58ad20b9ff69",
+      "t05_forecast/core.py": "c6c2ce1afbd2702ae26e1c8ba3a3c83301c784153005bce8e586b77fc9627a48",
+      "t05_forecast/gp.py": "bbaa85e80e58f70984db0dc4c84f8dc7cefac3af8b0a721196960bae8d00ebb0",
+      "t05_forecast/template.py": "f69236aa88bce0dc3b5c9f29e74430838b841b1502c63f26c35ce9cf71fa8ea6",
+      "t05_forecast/prayer.py": "20c1627228009250e32359925aeeb55279041c2bc3fe81dcb8a63f37ba92c2ff",
+      "t05_forecast/pipeline.py": "91f42155fa6ab9c2101cd9e54cf89f97cec98d47a5f93d2a4627d54485a11240",
+      "t05_forecast/submit.py": "ecbaa702b4b455312eda7bedc60613f868888f3d4c77942dbdb12d789d4b3176"
+    },
+    "versions": {
+      "numpy": "2.5.5",
+      "pandas": "3.1.1",
+      "scipy": "1.18.1",
+      "scikit-learn": "1.9.1"
+    },
+    "config": {
+      "mode": "strict",
+      "steps": "140",
+      "members": [
+        {
+          "ells": "3,12,60",
+          "kinds": "ou,m32,ou"
+        },
+        {
+          "ells": "2,13,33",
+          "kinds": "ou,m32,ou",
+          "rank": "4",
+          "same": "0"
+        },
+        {
+          "ells": "2,8,90",
+          "kinds": "ou,m32,ou"
+        },
+        {
+          "ells": "4,45",
+          "kinds": "ou,ou",
+          "only_kinds": "forecast,missing"
+        },
+        {
+          "ells": "2.5,26",
+          "kinds": "ou,ou",
+          "rank": "4",
+          "same": "0",
+          "delay": "0",
+          "only_kinds": "forecast,missing"
+        },
+        {
+          "ells": "3,12,60",
+          "kinds": "ou,m32,ou",
+          "lam": "0.7",
+          "only_kinds": "forecast"
+        }
+      ],
+      "missing_direct": "0.25",
+      "w_hidden": "0.9",
+      "w_hidden-future": "0.85",
+      "keep_base_kinds": "hidden,hidden-future,missing"
+    }
+  },
+  "entries": [
+    {
+      "setting": "historical",
+      "heldout": "20260911_1100",
+      "excluded_date": "2026-09-11",
+      "training_recordings": [
+        "20260919_1100"
+      ],
+      "template_source_recordings": [
+        "20260912_1100"
+      ],
+      "field_rows": [
+        96
+      ],
+      "field_sha256": "797b4f0e8b0adb09ed8f0a8da55a425809d71e4df54d8e5b332ea2415b455919",
+      "member_key": "lam0.8_r2_e3.0-12.0-60.0_ou-m32-ou_dl1_dt1_sm1_s140",
+      "fit_settings": {
+        "ells": [
+          3.0,
+          12.0,
+          60.0
+        ],
+        "kinds": [
+          "ou",
+          "m32",
+          "ou"
+        ],
+        "rank": 2,
+        "steps": 140,
+        "threads": null,
+        "use_delay": true,
+        "use_delta": true,
+        "use_same_minute": true,
+        "verbose": false
+      },
+      "filename": "params_heldout_20260911_1100_sample96_lam0.8_r2_e3.0-12.0-60.0_ou-m32-ou_dl1_dt1_sm1_s140.npz",
+      "legacy_path": "outputs/local_score/t05_fit_cache/params_heldout_20260911_1100_sample96_lam0.8_r2_e3.0-12.0-60.0_ou-m32-ou_dl1_dt1_sm1_s140.npz",
+      "sha256": "35a96c569d80a77b9e1daf908cc6fb9f7ce377c16dd502aae56a63d687f7333d",
+      "creation_code_version": "unknown",
+      "creation_input_hashes": "unknown",
+      "provenance": "legacy_not_fully_verified",
+      "reconstructed_recipe_evidence": "current recipe reconstructed; no original field digest stored",
+      "evidence": []
+    },
+    {
+      "setting": "historical",
+      "heldout": "20260911_1100",
+      "excluded_date": "2026-09-11",
+      "training_recordings": [
+        "20260919_1100"
+      ],
+      "template_source_recordings": [
+        "20260912_1100"
+      ],
+      "field_rows": [
+        96
+      ],
+      "field_sha256": "797b4f0e8b0adb09ed8f0a8da55a425809d71e4df54d8e5b332ea2415b455919",
+      "member_key": "lam0.8_r4_e2.0-13.0-33.0_ou-m32-ou_dl1_dt1_sm0_s140",
+      "fit_settings": {
+        "ells": [
+          2.0,
+          13.0,
+          33.0
+        ],
+        "kinds": [
+          "ou",
+          "m32",
+          "ou"
+        ],
+        "rank": 4,
+        "steps": 140,
+        "threads": null,
+        "use_delay": true,
+        "use_delta": true,
+        "use_same_minute": false,
+        "verbose": false
+      },
+      "filename": "params_heldout_20260911_1100_sample96_lam0.8_r4_e2.0-13.0-33.0_ou-m32-ou_dl1_dt1_sm0_s140.npz",
+      "legacy_path": "outputs/local_score/t05_fit_cache/params_heldout_20260911_1100_sample96_lam0.8_r4_e2.0-13.0-33.0_ou-m32-ou_dl1_dt1_sm0_s140.npz",
+      "sha256": "0438159f9e21570da8f27d299a16872274795ca4637619a83a420988d382a818",
+      "creation_code_version": "unknown",
+      "creation_input_hashes": "unknown",
+      "provenance": "legacy_not_fully_verified",
+      "reconstructed_recipe_evidence": "current recipe reconstructed; no original field digest stored",
+      "evidence": []
+    },
+    {
+      "setting": "historical",
+      "heldout": "20260911_1100",
+      "excluded_date": "2026-09-11",
+      "training_recordings": [
+        "20260919_1100"
+      ],
+      "template_source_recordings": [
+        "20260912_1100"
+      ],
+      "field_rows": [
+        96
+      ],
+      "field_sha256": "797b4f0e8b0adb09ed8f0a8da55a425809d71e4df54d8e5b332ea2415b455919",
+      "member_key": "lam0.8_r2_e2.0-8.0-90.0_ou-m32-ou_dl1_dt1_sm1_s140",
+      "fit_settings": {
+        "ells": [
+          2.0,
+          8.0,
+          90.0
+        ],
+        "kinds": [
+          "ou",
+          "m32",
+          "ou"
+        ],
+        "rank": 2,
+        "steps": 140,
+        "threads": null,
+        "use_delay": true,
+        "use_delta": true,
+        "use_same_minute": true,
+        "verbose": false
+      },
+      "filename": "params_heldout_20260911_1100_sample96_lam0.8_r2_e2.0-8.0-90.0_ou-m32-ou_dl1_dt1_sm1_s140.npz",
+      "legacy_path": "outputs/local_score/t05_fit_cache/params_heldout_20260911_1100_sample96_lam0.8_r2_e2.0-8.0-90.0_ou-m32-ou_dl1_dt1_sm1_s140.npz",
+      "sha256": "0143dceeda4b506856d8e332c2c88559945ca60e9291f305884fe572555cd0e7",
+      "creation_code_version": "unknown",
+      "creation_input_hashes": "unknown",
+      "provenance": "legacy_not_fully_verified",
+      "reconstructed_recipe_evidence": "current recipe reconstructed; no original field digest stored",
+      "evidence": []
+    },
+    {
+      "setting": "historical",
+      "heldout": "20260911_1100",
+      "excluded_date": "2026-09-11",
+      "training_recordings": [
+        "20260919_1100"
+      ],
+      "template_source_recordings": [
+        "20260912_1100"
+      ],
+      "field_rows": [
+        96
+      ],
+      "field_sha256": "797b4f0e8b0adb09ed8f0a8da55a425809d71e4df54d8e5b332ea2415b455919",
+      "member_key": "lam0.8_r2_e4.0-45.0_ou-ou_dl1_dt1_sm1_s140",
+      "fit_settings": {
+        "ells": [
+          4.0,
+          45.0
+        ],
+        "kinds": [
+          "ou",
+          "ou"
+        ],
+        "rank": 2,
+        "steps": 140,
+        "threads": null,
+        "use_delay": true,
+        "use_delta": true,
+        "use_same_minute": true,
+        "verbose": false
+      },
+      "filename": "params_heldout_20260911_1100_sample96_lam0.8_r2_e4.0-45.0_ou-ou_dl1_dt1_sm1_s140.npz",
+      "legacy_path": "outputs/local_score/t05_fit_cache/params_heldout_20260911_1100_sample96_lam0.8_r2_e4.0-45.0_ou-ou_dl1_dt1_sm1_s140.npz",
+      "sha256": "30a632c00dc9b1ea8c8e6e76ee777ce71bf41ff5b8ef5cdaefb2368a3d74c933",
+      "creation_code_version": "unknown",
+      "creation_input_hashes": "unknown",
+      "provenance": "legacy_not_fully_verified",
+      "reconstructed_recipe_evidence": "current recipe reconstructed; no original field digest stored",
+      "evidence": []
+    },
+    {
+      "setting": "historical",
+      "heldout": "20260911_1100",
+      "excluded_date": "2026-09-11",
+      "training_recordings": [
+        "20260919_1100"
+      ],
+      "template_source_recordings": [
+        "20260912_1100"
+      ],
+      "field_rows": [
+        96
+      ],
+      "field_sha256": "797b4f0e8b0adb09ed8f0a8da55a425809d71e4df54d8e5b332ea2415b455919",
+      "member_key": "lam0.8_r4_e2.5-26.0_ou-ou_dl0_dt1_sm0_s140",
+      "fit_settings": {
+        "ells": [
+          2.5,
+          26.0
+        ],
+        "kinds": [
+          "ou",
+          "ou"
+        ],
+        "rank": 4,
+        "steps": 140,
+        "threads": null,
+        "use_delay": false,
+        "use_delta": true,
+        "use_same_minute": false,
+        "verbose": false
+      },
+      "filename": "params_heldout_20260911_1100_sample96_lam0.8_r4_e2.5-26.0_ou-ou_dl0_dt1_sm0_s140.npz",
+      "legacy_path": "outputs/local_score/t05_fit_cache/params_heldout_20260911_1100_sample96_lam0.8_r4_e2.5-26.0_ou-ou_dl0_dt1_sm0_s140.npz",
+      "sha256": "215363d8031bdca6abb284b863c1775b71e496461a70a46e3e2c206e2e26aadd",
+      "creation_code_version": "unknown",
+      "creation_input_hashes": "unknown",
+      "provenance": "legacy_not_fully_verified",
+      "reconstructed_recipe_evidence": "current recipe reconstructed; no original field digest stored",
+      "evidence": []
+    },
+    {
+      "setting": "historical",
+      "heldout": "20260911_1100",
+      "excluded_date": "2026-09-11",
+      "training_recordings": [
+        "20260919_1100"
+      ],
+      "template_source_recordings": [
+        "20260912_1100"
+      ],
+      "field_rows": [
+        96
+      ],
+      "field_sha256": "372c5ae9ceb64f4da616dac2efe28919931b4fd09dd398d105d96442ded59a9f",
+      "member_key": "lam0.7_r2_e3.0-12.0-60.0_ou-m32-ou_dl1_dt1_sm1_s140",
+      "fit_settings": {
+        "ells": [
+          3.0,
+          12.0,
+          60.0
+        ],
+        "kinds": [
+          "ou",
+          "m32",
+          "ou"
+        ],
+        "rank": 2,
+        "steps": 140,
+        "threads": null,
+        "use_delay": true,
+        "use_delta": true,
+        "use_same_minute": true,
+        "verbose": false
+      },
+      "filename": "params_heldout_20260911_1100_sample96_lam0.7_r2_e3.0-12.0-60.0_ou-m32-ou_dl1_dt1_sm1_s140.npz",
+      "legacy_path": "outputs/local_score/t05_fit_cache/params_heldout_20260911_1100_sample96_lam0.7_r2_e3.0-12.0-60.0_ou-m32-ou_dl1_dt1_sm1_s140.npz",
+      "sha256": "31c71e978e928ac5b40819404c2933e0c341f1c9d5de039ace7ac2be1b2c93e7",
+      "creation_code_version": "unknown",
+      "creation_input_hashes": "unknown",
+      "provenance": "legacy_not_fully_verified",
+      "reconstructed_recipe_evidence": "current recipe reconstructed; no original field digest stored",
+      "evidence": []
+    },
+    {
+      "setting": "historical",
+      "heldout": "20260912_1100",
+      "excluded_date": "2026-09-12",
+      "training_recordings": [
+        "20260918_1100"
+      ],
+      "template_source_recordings": [
+        "20260911_1100"
+      ],
+      "field_rows": [
+        96
+      ],
+      "field_sha256": "05456f05e098e385479a704c3b04ec4d6165933ccf265f75cd4f00ca3e07f5f4",
+      "member_key": "lam0.8_r2_e3.0-12.0-60.0_ou-m32-ou_dl1_dt1_sm1_s140",
+      "fit_settings": {
+        "ells": [
+          3.0,
+          12.0,
+          60.0
+        ],
+        "kinds": [
+          "ou",
+          "m32",
+          "ou"
+        ],
+        "rank": 2,
+        "steps": 140,
+        "threads": null,
+        "use_delay": true,
+        "use_delta": true,
+        "use_same_minute": true,
+        "verbose": false
+      },
+      "filename": "params_heldout_20260912_1100_sample96_lam0.8_r2_e3.0-12.0-60.0_ou-m32-ou_dl1_dt1_sm1_s140.npz",
+      "legacy_path": "outputs/local_score/t05_fit_cache/params_heldout_20260912_1100_sample96_lam0.8_r2_e3.0-12.0-60.0_ou-m32-ou_dl1_dt1_sm1_s140.npz",
+      "sha256": "893c9ed694e4e7402a1bc84143c10aef5ce105be51063ace8bf7c997ffac4cbf",
+      "creation_code_version": "unknown",
+      "creation_input_hashes": "unknown",
+      "provenance": "legacy_not_fully_verified",
+      "reconstructed_recipe_evidence": "current recipe reconstructed; no original field digest stored",
+      "evidence": []
+    },
+    {
+      "setting": "historical",
+      "heldout": "20260912_1100",
+      "excluded_date": "2026-09-12",
+      "training_recordings": [
+        "20260918_1100"
+      ],
+      "template_source_recordings": [
+        "20260911_1100"
+      ],
+      "field_rows": [
+        96
+      ],
+      "field_sha256": "05456f05e098e385479a704c3b04ec4d6165933ccf265f75cd4f00ca3e07f5f4",
+      "member_key": "lam0.8_r4_e2.0-13.0-33.0_ou-m32-ou_dl1_dt1_sm0_s140",
+      "fit_settings": {
+        "ells": [
+          2.0,
+          13.0,
+          33.0
+        ],
+        "kinds": [
+          "ou",
+          "m32",
+          "ou"
+        ],
+        "rank": 4,
+        "steps": 140,
+        "threads": null,
+        "use_delay": true,
+        "use_delta": true,
+        "use_same_minute": false,
+        "verbose": false
+      },
+      "filename": "params_heldout_20260912_1100_sample96_lam0.8_r4_e2.0-13.0-33.0_ou-m32-ou_dl1_dt1_sm0_s140.npz",
+      "legacy_path": "outputs/local_score/t05_fit_cache/params_heldout_20260912_1100_sample96_lam0.8_r4_e2.0-13.0-33.0_ou-m32-ou_dl1_dt1_sm0_s140.npz",
+      "sha256": "3190330a4a91493deaf02eb47236717a567a6a63aba57829d9c725a929ca731b",
+      "creation_code_version": "unknown",
+      "creation_input_hashes": "unknown",
+      "provenance": "legacy_not_fully_verified",
+      "reconstructed_recipe_evidence": "current recipe reconstructed; no original field digest stored",
+      "evidence": []
+    },
+    {
+      "setting": "historical",
+      "heldout": "20260912_1100",
+      "excluded_date": "2026-09-12",
+      "training_recordings": [
+        "20260918_1100"
+      ],
+      "template_source_recordings": [
+        "20260911_1100"
+      ],
+      "field_rows": [
+        96
+      ],
+      "field_sha256": "05456f05e098e385479a704c3b04ec4d6165933ccf265f75cd4f00ca3e07f5f4",
+      "member_key": "lam0.8_r2_e2.0-8.0-90.0_ou-m32-ou_dl1_dt1_sm1_s140",
+      "fit_settings": {
+        "ells": [
+          2.0,
+          8.0,
+          90.0
+        ],
+        "kinds": [
+          "ou",
+          "m32",
+          "ou"
+        ],
+        "rank": 2,
+        "steps": 140,
+        "threads": null,
+        "use_delay": true,
+        "use_delta": true,
+        "use_same_minute": true,
+        "verbose": false
+      },
+      "filename": "params_heldout_20260912_1100_sample96_lam0.8_r2_e2.0-8.0-90.0_ou-m32-ou_dl1_dt1_sm1_s140.npz",
+      "legacy_path": "outputs/local_score/t05_fit_cache/params_heldout_20260912_1100_sample96_lam0.8_r2_e2.0-8.0-90.0_ou-m32-ou_dl1_dt1_sm1_s140.npz",
+      "sha256": "9591b3c0bf0b779b06d265e28029589dec73b00c161e1614865344a635fc0b31",
+      "creation_code_version": "unknown",
+      "creation_input_hashes": "unknown",
+      "provenance": "legacy_not_fully_verified",
+      "reconstructed_recipe_evidence": "current recipe reconstructed; no original field digest stored",
+      "evidence": []
+    },
+    {
+      "setting": "historical",
+      "heldout": "20260912_1100",
+      "excluded_date": "2026-09-12",
+      "training_recordings": [
+        "20260918_1100"
+      ],
+      "template_source_recordings": [
+        "20260911_1100"
+      ],
+      "field_rows": [
+        96
+      ],
+      "field_sha256": "05456f05e098e385479a704c3b04ec4d6165933ccf265f75cd4f00ca3e07f5f4",
+      "member_key": "lam0.8_r2_e4.0-45.0_ou-ou_dl1_dt1_sm1_s140",
+      "fit_settings": {
+        "ells": [
+          4.0,
+          45.0
+        ],
+        "kinds": [
+          "ou",
+          "ou"
+        ],
+        "rank": 2,
+        "steps": 140,
+        "threads": null,
+        "use_delay": true,
+        "use_delta": true,
+        "use_same_minute": true,
+        "verbose": false
+      },
+      "filename": "params_heldout_20260912_1100_sample96_lam0.8_r2_e4.0-45.0_ou-ou_dl1_dt1_sm1_s140.npz",
+      "legacy_path": "outputs/local_score/t05_fit_cache/params_heldout_20260912_1100_sample96_lam0.8_r2_e4.0-45.0_ou-ou_dl1_dt1_sm1_s140.npz",
+      "sha256": "da580df08cca0fb7a0dc66dfbab2dc8893ef0ded383d721b10ca7d849b0b9b62",
+      "creation_code_version": "unknown",
+      "creation_input_hashes": "unknown",
+      "provenance": "legacy_not_fully_verified",
+      "reconstructed_recipe_evidence": "current recipe reconstructed; no original field digest stored",
+      "evidence": []
+    },
+    {
+      "setting": "historical",
+      "heldout": "20260912_1100",
+      "excluded_date": "2026-09-12",
+      "training_recordings": [
+        "20260918_1100"
+      ],
+      "template_source_recordings": [
+        "20260911_1100"
+      ],
+      "field_rows": [
+        96
+      ],
+      "field_sha256": "05456f05e098e385479a704c3b04ec4d6165933ccf265f75cd4f00ca3e07f5f4",
+      "member_key": "lam0.8_r4_e2.5-26.0_ou-ou_dl0_dt1_sm0_s140",
+      "fit_settings": {
+        "ells": [
+          2.5,
+          26.0
+        ],
+        "kinds": [
+          "ou",
+          "ou"
+        ],
+        "rank": 4,
+        "steps": 140,
+        "threads": null,
+        "use_delay": false,
+        "use_delta": true,
+        "use_same_minute": false,
+        "verbose": false
+      },
+      "filename": "params_heldout_20260912_1100_sample96_lam0.8_r4_e2.5-26.0_ou-ou_dl0_dt1_sm0_s140.npz",
+      "legacy_path": "outputs/local_score/t05_fit_cache/params_heldout_20260912_1100_sample96_lam0.8_r4_e2.5-26.0_ou-ou_dl0_dt1_sm0_s140.npz",
+      "sha256": "ffcf047d798774023ab5bf8a4f587166ef59d80a3d3486351b85d9d5671cb687",
+      "creation_code_version": "unknown",
+      "creation_input_hashes": "unknown",
+      "provenance": "legacy_not_fully_verified",
+      "reconstructed_recipe_evidence": "current recipe reconstructed; no original field digest stored",
+      "evidence": []
+    },
+    {
+      "setting": "historical",
+      "heldout": "20260912_1100",
+      "excluded_date": "2026-09-12",
+      "training_recordings": [
+        "20260918_1100"
+      ],
+      "template_source_recordings": [
+        "20260911_1100"
+      ],
+      "field_rows": [
+        96
+      ],
+      "field_sha256": "d446abb72834b3a794c96a352db7cde3947473dbb5ae4a4dccfc0e5227736896",
+      "member_key": "lam0.7_r2_e3.0-12.0-60.0_ou-m32-ou_dl1_dt1_sm1_s140",
+      "fit_settings": {
+        "ells": [
+          3.0,
+          12.0,
+          60.0
+        ],
+        "kinds": [
+          "ou",
+          "m32",
+          "ou"
+        ],
+        "rank": 2,
+        "steps": 140,
+        "threads": null,
+        "use_delay": true,
+        "use_delta": true,
+        "use_same_minute": true,
+        "verbose": false
+      },
+      "filename": "params_heldout_20260912_1100_sample96_lam0.7_r2_e3.0-12.0-60.0_ou-m32-ou_dl1_dt1_sm1_s140.npz",
+      "legacy_path": "outputs/local_score/t05_fit_cache/params_heldout_20260912_1100_sample96_lam0.7_r2_e3.0-12.0-60.0_ou-m32-ou_dl1_dt1_sm1_s140.npz",
+      "sha256": "604fff21bb827887cf43473d9be224f2f270c8c0ead688f3cacff3aeaa7cd855",
+      "creation_code_version": "unknown",
+      "creation_input_hashes": "unknown",
+      "provenance": "legacy_not_fully_verified",
+      "reconstructed_recipe_evidence": "current recipe reconstructed; no original field digest stored",
+      "evidence": []
+    },
+    {
+      "setting": "representative",
+      "heldout": "20260918_1100",
+      "excluded_date": "2026-09-18",
+      "training_recordings": [
+        "20260919_1100",
+        "20260911_1100",
+        "20260912_1100"
+      ],
+      "template_source_recordings": [
+        "20260904_1105",
+        "20260905_0426",
+        "20260905_1124",
+        "20260905_1900",
+        "20260911_1100",
+        "20260912_1100"
+      ],
+      "field_rows": [
+        1763,
+        1125,
+        1808
+      ],
+      "field_sha256": "b51b8fc1454b13199c566ddeec13bfac53e408ababd137f05dcb4e0a7b6c1e22",
+      "member_key": "lam0.8_r2_e3.0-12.0-60.0_ou-m32-ou_dl1_dt1_sm1_s140",
+      "fit_settings": {
+        "ells": [
+          3.0,
+          12.0,
+          60.0
+        ],
+        "kinds": [
+          "ou",
+          "m32",
+          "ou"
+        ],
+        "rank": 2,
+        "steps": 140,
+        "threads": null,
+        "use_delay": true,
+        "use_delta": true,
+        "use_same_minute": true,
+        "verbose": false
+      },
+      "filename": "params_fully_excluded_20260918_1100_0c5780c4f64316e1_lam0.8_r2_e3.0-12.0-60.0_ou-m32-ou_dl1_dt1_sm1_s140.npz",
+      "legacy_path": "outputs/weekly_forecast_diagnostic/fit_cache/params_fully_excluded_20260918_1100_0c5780c4f64316e1_lam0.8_r2_e3.0-12.0-60.0_ou-m32-ou_dl1_dt1_sm1_s140.npz",
+      "sha256": "8e5babccd4b527a7a908190467e049fc5d8f120ef2ad10e01a861b6fab8f919f",
+      "creation_code_version": "unknown",
+      "creation_input_hashes": "unknown",
+      "provenance": "legacy_not_fully_verified",
+      "reconstructed_recipe_evidence": "field digest matches legacy key and fitting log",
+      "evidence": [
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\run.log",
+          "sha256": "f03d92fdb00b43dcd0f8a8a88db5170096659e75115079f05d4175bf834aab67"
+        },
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\run_final.log",
+          "sha256": "cb984e9443ea9729b5238402ba1ae457ee9455a0f491ccb8ec87b6d1ce481e95"
+        },
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\verification.json",
+          "sha256": "9bc7d48865e4694983ccff3c555e77801176c96b5e4d0419288c7f58f6098abb"
+        },
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\fit_exclusion_audit.csv",
+          "sha256": "4719e79d75cea2250e4181a96f1498f7554ff933ea8f83d9902157b36ca8f26f"
+        }
+      ]
+    },
+    {
+      "setting": "representative",
+      "heldout": "20260918_1100",
+      "excluded_date": "2026-09-18",
+      "training_recordings": [
+        "20260919_1100",
+        "20260911_1100",
+        "20260912_1100"
+      ],
+      "template_source_recordings": [
+        "20260904_1105",
+        "20260905_0426",
+        "20260905_1124",
+        "20260905_1900",
+        "20260911_1100",
+        "20260912_1100"
+      ],
+      "field_rows": [
+        1763,
+        1125,
+        1808
+      ],
+      "field_sha256": "b51b8fc1454b13199c566ddeec13bfac53e408ababd137f05dcb4e0a7b6c1e22",
+      "member_key": "lam0.8_r4_e2.0-13.0-33.0_ou-m32-ou_dl1_dt1_sm0_s140",
+      "fit_settings": {
+        "ells": [
+          2.0,
+          13.0,
+          33.0
+        ],
+        "kinds": [
+          "ou",
+          "m32",
+          "ou"
+        ],
+        "rank": 4,
+        "steps": 140,
+        "threads": null,
+        "use_delay": true,
+        "use_delta": true,
+        "use_same_minute": false,
+        "verbose": false
+      },
+      "filename": "params_fully_excluded_20260918_1100_0c5780c4f64316e1_lam0.8_r4_e2.0-13.0-33.0_ou-m32-ou_dl1_dt1_sm0_s140.npz",
+      "legacy_path": "outputs/weekly_forecast_diagnostic/fit_cache/params_fully_excluded_20260918_1100_0c5780c4f64316e1_lam0.8_r4_e2.0-13.0-33.0_ou-m32-ou_dl1_dt1_sm0_s140.npz",
+      "sha256": "d5357117e8396f699ca94f28a69345e7d561a4877b30c121e1a64124a048c13f",
+      "creation_code_version": "unknown",
+      "creation_input_hashes": "unknown",
+      "provenance": "legacy_not_fully_verified",
+      "reconstructed_recipe_evidence": "field digest matches legacy key and fitting log",
+      "evidence": [
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\run.log",
+          "sha256": "f03d92fdb00b43dcd0f8a8a88db5170096659e75115079f05d4175bf834aab67"
+        },
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\run_final.log",
+          "sha256": "cb984e9443ea9729b5238402ba1ae457ee9455a0f491ccb8ec87b6d1ce481e95"
+        },
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\verification.json",
+          "sha256": "9bc7d48865e4694983ccff3c555e77801176c96b5e4d0419288c7f58f6098abb"
+        },
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\fit_exclusion_audit.csv",
+          "sha256": "4719e79d75cea2250e4181a96f1498f7554ff933ea8f83d9902157b36ca8f26f"
+        }
+      ]
+    },
+    {
+      "setting": "representative",
+      "heldout": "20260918_1100",
+      "excluded_date": "2026-09-18",
+      "training_recordings": [
+        "20260919_1100",
+        "20260911_1100",
+        "20260912_1100"
+      ],
+      "template_source_recordings": [
+        "20260904_1105",
+        "20260905_0426",
+        "20260905_1124",
+        "20260905_1900",
+        "20260911_1100",
+        "20260912_1100"
+      ],
+      "field_rows": [
+        1763,
+        1125,
+        1808
+      ],
+      "field_sha256": "b51b8fc1454b13199c566ddeec13bfac53e408ababd137f05dcb4e0a7b6c1e22",
+      "member_key": "lam0.8_r2_e2.0-8.0-90.0_ou-m32-ou_dl1_dt1_sm1_s140",
+      "fit_settings": {
+        "ells": [
+          2.0,
+          8.0,
+          90.0
+        ],
+        "kinds": [
+          "ou",
+          "m32",
+          "ou"
+        ],
+        "rank": 2,
+        "steps": 140,
+        "threads": null,
+        "use_delay": true,
+        "use_delta": true,
+        "use_same_minute": true,
+        "verbose": false
+      },
+      "filename": "params_fully_excluded_20260918_1100_0c5780c4f64316e1_lam0.8_r2_e2.0-8.0-90.0_ou-m32-ou_dl1_dt1_sm1_s140.npz",
+      "legacy_path": "outputs/weekly_forecast_diagnostic/fit_cache/params_fully_excluded_20260918_1100_0c5780c4f64316e1_lam0.8_r2_e2.0-8.0-90.0_ou-m32-ou_dl1_dt1_sm1_s140.npz",
+      "sha256": "e95f996748d578128e1be6ca4c112e0458bd7c1e29d90c59c83884a6cd68c5fe",
+      "creation_code_version": "unknown",
+      "creation_input_hashes": "unknown",
+      "provenance": "legacy_not_fully_verified",
+      "reconstructed_recipe_evidence": "field digest matches legacy key and fitting log",
+      "evidence": [
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\run.log",
+          "sha256": "f03d92fdb00b43dcd0f8a8a88db5170096659e75115079f05d4175bf834aab67"
+        },
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\run_final.log",
+          "sha256": "cb984e9443ea9729b5238402ba1ae457ee9455a0f491ccb8ec87b6d1ce481e95"
+        },
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\verification.json",
+          "sha256": "9bc7d48865e4694983ccff3c555e77801176c96b5e4d0419288c7f58f6098abb"
+        },
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\fit_exclusion_audit.csv",
+          "sha256": "4719e79d75cea2250e4181a96f1498f7554ff933ea8f83d9902157b36ca8f26f"
+        }
+      ]
+    },
+    {
+      "setting": "representative",
+      "heldout": "20260918_1100",
+      "excluded_date": "2026-09-18",
+      "training_recordings": [
+        "20260919_1100",
+        "20260911_1100",
+        "20260912_1100"
+      ],
+      "template_source_recordings": [
+        "20260904_1105",
+        "20260905_0426",
+        "20260905_1124",
+        "20260905_1900",
+        "20260911_1100",
+        "20260912_1100"
+      ],
+      "field_rows": [
+        1763,
+        1125,
+        1808
+      ],
+      "field_sha256": "b51b8fc1454b13199c566ddeec13bfac53e408ababd137f05dcb4e0a7b6c1e22",
+      "member_key": "lam0.8_r2_e4.0-45.0_ou-ou_dl1_dt1_sm1_s140",
+      "fit_settings": {
+        "ells": [
+          4.0,
+          45.0
+        ],
+        "kinds": [
+          "ou",
+          "ou"
+        ],
+        "rank": 2,
+        "steps": 140,
+        "threads": null,
+        "use_delay": true,
+        "use_delta": true,
+        "use_same_minute": true,
+        "verbose": false
+      },
+      "filename": "params_fully_excluded_20260918_1100_0c5780c4f64316e1_lam0.8_r2_e4.0-45.0_ou-ou_dl1_dt1_sm1_s140.npz",
+      "legacy_path": "outputs/weekly_forecast_diagnostic/fit_cache/params_fully_excluded_20260918_1100_0c5780c4f64316e1_lam0.8_r2_e4.0-45.0_ou-ou_dl1_dt1_sm1_s140.npz",
+      "sha256": "1bfab4ebfcc27ee53eb2e28ccc123dc07a406d27221d432a04e1feddd27b169c",
+      "creation_code_version": "unknown",
+      "creation_input_hashes": "unknown",
+      "provenance": "legacy_not_fully_verified",
+      "reconstructed_recipe_evidence": "field digest matches legacy key and fitting log",
+      "evidence": [
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\run.log",
+          "sha256": "f03d92fdb00b43dcd0f8a8a88db5170096659e75115079f05d4175bf834aab67"
+        },
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\run_final.log",
+          "sha256": "cb984e9443ea9729b5238402ba1ae457ee9455a0f491ccb8ec87b6d1ce481e95"
+        },
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\verification.json",
+          "sha256": "9bc7d48865e4694983ccff3c555e77801176c96b5e4d0419288c7f58f6098abb"
+        },
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\fit_exclusion_audit.csv",
+          "sha256": "4719e79d75cea2250e4181a96f1498f7554ff933ea8f83d9902157b36ca8f26f"
+        }
+      ]
+    },
+    {
+      "setting": "representative",
+      "heldout": "20260918_1100",
+      "excluded_date": "2026-09-18",
+      "training_recordings": [
+        "20260919_1100",
+        "20260911_1100",
+        "20260912_1100"
+      ],
+      "template_source_recordings": [
+        "20260904_1105",
+        "20260905_0426",
+        "20260905_1124",
+        "20260905_1900",
+        "20260911_1100",
+        "20260912_1100"
+      ],
+      "field_rows": [
+        1763,
+        1125,
+        1808
+      ],
+      "field_sha256": "b51b8fc1454b13199c566ddeec13bfac53e408ababd137f05dcb4e0a7b6c1e22",
+      "member_key": "lam0.8_r4_e2.5-26.0_ou-ou_dl0_dt1_sm0_s140",
+      "fit_settings": {
+        "ells": [
+          2.5,
+          26.0
+        ],
+        "kinds": [
+          "ou",
+          "ou"
+        ],
+        "rank": 4,
+        "steps": 140,
+        "threads": null,
+        "use_delay": false,
+        "use_delta": true,
+        "use_same_minute": false,
+        "verbose": false
+      },
+      "filename": "params_fully_excluded_20260918_1100_0c5780c4f64316e1_lam0.8_r4_e2.5-26.0_ou-ou_dl0_dt1_sm0_s140.npz",
+      "legacy_path": "outputs/weekly_forecast_diagnostic/fit_cache/params_fully_excluded_20260918_1100_0c5780c4f64316e1_lam0.8_r4_e2.5-26.0_ou-ou_dl0_dt1_sm0_s140.npz",
+      "sha256": "2797717e9786e69431f21d990cea78cfad2e1bd8d8d24b502154524b7bd7ac35",
+      "creation_code_version": "unknown",
+      "creation_input_hashes": "unknown",
+      "provenance": "legacy_not_fully_verified",
+      "reconstructed_recipe_evidence": "field digest matches legacy key and fitting log",
+      "evidence": [
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\run.log",
+          "sha256": "f03d92fdb00b43dcd0f8a8a88db5170096659e75115079f05d4175bf834aab67"
+        },
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\run_final.log",
+          "sha256": "cb984e9443ea9729b5238402ba1ae457ee9455a0f491ccb8ec87b6d1ce481e95"
+        },
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\verification.json",
+          "sha256": "9bc7d48865e4694983ccff3c555e77801176c96b5e4d0419288c7f58f6098abb"
+        },
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\fit_exclusion_audit.csv",
+          "sha256": "4719e79d75cea2250e4181a96f1498f7554ff933ea8f83d9902157b36ca8f26f"
+        }
+      ]
+    },
+    {
+      "setting": "representative",
+      "heldout": "20260918_1100",
+      "excluded_date": "2026-09-18",
+      "training_recordings": [
+        "20260919_1100",
+        "20260911_1100",
+        "20260912_1100"
+      ],
+      "template_source_recordings": [
+        "20260904_1105",
+        "20260905_0426",
+        "20260905_1124",
+        "20260905_1900",
+        "20260911_1100",
+        "20260912_1100"
+      ],
+      "field_rows": [
+        1763,
+        1125,
+        1808
+      ],
+      "field_sha256": "5d60f841155bec0d39b0309254186fe25005748e16073655fc388e078546c098",
+      "member_key": "lam0.7_r2_e3.0-12.0-60.0_ou-m32-ou_dl1_dt1_sm1_s140",
+      "fit_settings": {
+        "ells": [
+          3.0,
+          12.0,
+          60.0
+        ],
+        "kinds": [
+          "ou",
+          "m32",
+          "ou"
+        ],
+        "rank": 2,
+        "steps": 140,
+        "threads": null,
+        "use_delay": true,
+        "use_delta": true,
+        "use_same_minute": true,
+        "verbose": false
+      },
+      "filename": "params_fully_excluded_20260918_1100_a0726dfa7ab94922_lam0.7_r2_e3.0-12.0-60.0_ou-m32-ou_dl1_dt1_sm1_s140.npz",
+      "legacy_path": "outputs/weekly_forecast_diagnostic/fit_cache/params_fully_excluded_20260918_1100_a0726dfa7ab94922_lam0.7_r2_e3.0-12.0-60.0_ou-m32-ou_dl1_dt1_sm1_s140.npz",
+      "sha256": "a6ece1f0e9e84e90b5da7f7521f4a49da2fe2b4f9c930fe101983c993ebe982a",
+      "creation_code_version": "unknown",
+      "creation_input_hashes": "unknown",
+      "provenance": "legacy_not_fully_verified",
+      "reconstructed_recipe_evidence": "field digest matches legacy key and fitting log",
+      "evidence": [
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\run.log",
+          "sha256": "f03d92fdb00b43dcd0f8a8a88db5170096659e75115079f05d4175bf834aab67"
+        },
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\run_final.log",
+          "sha256": "cb984e9443ea9729b5238402ba1ae457ee9455a0f491ccb8ec87b6d1ce481e95"
+        },
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\verification.json",
+          "sha256": "9bc7d48865e4694983ccff3c555e77801176c96b5e4d0419288c7f58f6098abb"
+        },
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\fit_exclusion_audit.csv",
+          "sha256": "4719e79d75cea2250e4181a96f1498f7554ff933ea8f83d9902157b36ca8f26f"
+        }
+      ]
+    },
+    {
+      "setting": "representative",
+      "heldout": "20260919_1100",
+      "excluded_date": "2026-09-19",
+      "training_recordings": [
+        "20260918_1100",
+        "20260911_1100",
+        "20260912_1100"
+      ],
+      "template_source_recordings": [
+        "20260904_1105",
+        "20260905_0426",
+        "20260905_1124",
+        "20260905_1900",
+        "20260911_1100",
+        "20260912_1100"
+      ],
+      "field_rows": [
+        1522,
+        1125,
+        1808
+      ],
+      "field_sha256": "d5e94a66446b75b2a49c4cc51543eccb6d4fc8ce13a25eebe7b0016709529afc",
+      "member_key": "lam0.8_r2_e3.0-12.0-60.0_ou-m32-ou_dl1_dt1_sm1_s140",
+      "fit_settings": {
+        "ells": [
+          3.0,
+          12.0,
+          60.0
+        ],
+        "kinds": [
+          "ou",
+          "m32",
+          "ou"
+        ],
+        "rank": 2,
+        "steps": 140,
+        "threads": null,
+        "use_delay": true,
+        "use_delta": true,
+        "use_same_minute": true,
+        "verbose": false
+      },
+      "filename": "params_fully_excluded_20260919_1100_a7522d350e6acce6_lam0.8_r2_e3.0-12.0-60.0_ou-m32-ou_dl1_dt1_sm1_s140.npz",
+      "legacy_path": "outputs/weekly_forecast_diagnostic/fit_cache/params_fully_excluded_20260919_1100_a7522d350e6acce6_lam0.8_r2_e3.0-12.0-60.0_ou-m32-ou_dl1_dt1_sm1_s140.npz",
+      "sha256": "2b7627139802e813236cc70bc27b94b0f0d7c85fd44a9a51be1494bb743625c7",
+      "creation_code_version": "unknown",
+      "creation_input_hashes": "unknown",
+      "provenance": "legacy_not_fully_verified",
+      "reconstructed_recipe_evidence": "field digest matches legacy key and fitting log",
+      "evidence": [
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\run.log",
+          "sha256": "f03d92fdb00b43dcd0f8a8a88db5170096659e75115079f05d4175bf834aab67"
+        },
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\run_final.log",
+          "sha256": "cb984e9443ea9729b5238402ba1ae457ee9455a0f491ccb8ec87b6d1ce481e95"
+        },
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\verification.json",
+          "sha256": "9bc7d48865e4694983ccff3c555e77801176c96b5e4d0419288c7f58f6098abb"
+        },
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\fit_exclusion_audit.csv",
+          "sha256": "4719e79d75cea2250e4181a96f1498f7554ff933ea8f83d9902157b36ca8f26f"
+        }
+      ]
+    },
+    {
+      "setting": "representative",
+      "heldout": "20260919_1100",
+      "excluded_date": "2026-09-19",
+      "training_recordings": [
+        "20260918_1100",
+        "20260911_1100",
+        "20260912_1100"
+      ],
+      "template_source_recordings": [
+        "20260904_1105",
+        "20260905_0426",
+        "20260905_1124",
+        "20260905_1900",
+        "20260911_1100",
+        "20260912_1100"
+      ],
+      "field_rows": [
+        1522,
+        1125,
+        1808
+      ],
+      "field_sha256": "d5e94a66446b75b2a49c4cc51543eccb6d4fc8ce13a25eebe7b0016709529afc",
+      "member_key": "lam0.8_r4_e2.0-13.0-33.0_ou-m32-ou_dl1_dt1_sm0_s140",
+      "fit_settings": {
+        "ells": [
+          2.0,
+          13.0,
+          33.0
+        ],
+        "kinds": [
+          "ou",
+          "m32",
+          "ou"
+        ],
+        "rank": 4,
+        "steps": 140,
+        "threads": null,
+        "use_delay": true,
+        "use_delta": true,
+        "use_same_minute": false,
+        "verbose": false
+      },
+      "filename": "params_fully_excluded_20260919_1100_a7522d350e6acce6_lam0.8_r4_e2.0-13.0-33.0_ou-m32-ou_dl1_dt1_sm0_s140.npz",
+      "legacy_path": "outputs/weekly_forecast_diagnostic/fit_cache/params_fully_excluded_20260919_1100_a7522d350e6acce6_lam0.8_r4_e2.0-13.0-33.0_ou-m32-ou_dl1_dt1_sm0_s140.npz",
+      "sha256": "0b7531fa2b9b3fa9b69fa8e8b17ea0b74fbf38ab0fdd032f9239f9eeeda39cb4",
+      "creation_code_version": "unknown",
+      "creation_input_hashes": "unknown",
+      "provenance": "legacy_not_fully_verified",
+      "reconstructed_recipe_evidence": "field digest matches legacy key and fitting log",
+      "evidence": [
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\run.log",
+          "sha256": "f03d92fdb00b43dcd0f8a8a88db5170096659e75115079f05d4175bf834aab67"
+        },
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\run_final.log",
+          "sha256": "cb984e9443ea9729b5238402ba1ae457ee9455a0f491ccb8ec87b6d1ce481e95"
+        },
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\verification.json",
+          "sha256": "9bc7d48865e4694983ccff3c555e77801176c96b5e4d0419288c7f58f6098abb"
+        },
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\fit_exclusion_audit.csv",
+          "sha256": "4719e79d75cea2250e4181a96f1498f7554ff933ea8f83d9902157b36ca8f26f"
+        }
+      ]
+    },
+    {
+      "setting": "representative",
+      "heldout": "20260919_1100",
+      "excluded_date": "2026-09-19",
+      "training_recordings": [
+        "20260918_1100",
+        "20260911_1100",
+        "20260912_1100"
+      ],
+      "template_source_recordings": [
+        "20260904_1105",
+        "20260905_0426",
+        "20260905_1124",
+        "20260905_1900",
+        "20260911_1100",
+        "20260912_1100"
+      ],
+      "field_rows": [
+        1522,
+        1125,
+        1808
+      ],
+      "field_sha256": "d5e94a66446b75b2a49c4cc51543eccb6d4fc8ce13a25eebe7b0016709529afc",
+      "member_key": "lam0.8_r2_e2.0-8.0-90.0_ou-m32-ou_dl1_dt1_sm1_s140",
+      "fit_settings": {
+        "ells": [
+          2.0,
+          8.0,
+          90.0
+        ],
+        "kinds": [
+          "ou",
+          "m32",
+          "ou"
+        ],
+        "rank": 2,
+        "steps": 140,
+        "threads": null,
+        "use_delay": true,
+        "use_delta": true,
+        "use_same_minute": true,
+        "verbose": false
+      },
+      "filename": "params_fully_excluded_20260919_1100_a7522d350e6acce6_lam0.8_r2_e2.0-8.0-90.0_ou-m32-ou_dl1_dt1_sm1_s140.npz",
+      "legacy_path": "outputs/weekly_forecast_diagnostic/fit_cache/params_fully_excluded_20260919_1100_a7522d350e6acce6_lam0.8_r2_e2.0-8.0-90.0_ou-m32-ou_dl1_dt1_sm1_s140.npz",
+      "sha256": "a99e2039effb83937755b90a0c48a770597bd58b5552cef2daecded465442f48",
+      "creation_code_version": "unknown",
+      "creation_input_hashes": "unknown",
+      "provenance": "legacy_not_fully_verified",
+      "reconstructed_recipe_evidence": "field digest matches legacy key and fitting log",
+      "evidence": [
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\run.log",
+          "sha256": "f03d92fdb00b43dcd0f8a8a88db5170096659e75115079f05d4175bf834aab67"
+        },
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\run_final.log",
+          "sha256": "cb984e9443ea9729b5238402ba1ae457ee9455a0f491ccb8ec87b6d1ce481e95"
+        },
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\verification.json",
+          "sha256": "9bc7d48865e4694983ccff3c555e77801176c96b5e4d0419288c7f58f6098abb"
+        },
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\fit_exclusion_audit.csv",
+          "sha256": "4719e79d75cea2250e4181a96f1498f7554ff933ea8f83d9902157b36ca8f26f"
+        }
+      ]
+    },
+    {
+      "setting": "representative",
+      "heldout": "20260919_1100",
+      "excluded_date": "2026-09-19",
+      "training_recordings": [
+        "20260918_1100",
+        "20260911_1100",
+        "20260912_1100"
+      ],
+      "template_source_recordings": [
+        "20260904_1105",
+        "20260905_0426",
+        "20260905_1124",
+        "20260905_1900",
+        "20260911_1100",
+        "20260912_1100"
+      ],
+      "field_rows": [
+        1522,
+        1125,
+        1808
+      ],
+      "field_sha256": "d5e94a66446b75b2a49c4cc51543eccb6d4fc8ce13a25eebe7b0016709529afc",
+      "member_key": "lam0.8_r2_e4.0-45.0_ou-ou_dl1_dt1_sm1_s140",
+      "fit_settings": {
+        "ells": [
+          4.0,
+          45.0
+        ],
+        "kinds": [
+          "ou",
+          "ou"
+        ],
+        "rank": 2,
+        "steps": 140,
+        "threads": null,
+        "use_delay": true,
+        "use_delta": true,
+        "use_same_minute": true,
+        "verbose": false
+      },
+      "filename": "params_fully_excluded_20260919_1100_a7522d350e6acce6_lam0.8_r2_e4.0-45.0_ou-ou_dl1_dt1_sm1_s140.npz",
+      "legacy_path": "outputs/weekly_forecast_diagnostic/fit_cache/params_fully_excluded_20260919_1100_a7522d350e6acce6_lam0.8_r2_e4.0-45.0_ou-ou_dl1_dt1_sm1_s140.npz",
+      "sha256": "9e20b6fc3b5c010b580ed0b31690a2054bf5f1fcb44c86efb29a0be0c62faa97",
+      "creation_code_version": "unknown",
+      "creation_input_hashes": "unknown",
+      "provenance": "legacy_not_fully_verified",
+      "reconstructed_recipe_evidence": "field digest matches legacy key and fitting log",
+      "evidence": [
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\run.log",
+          "sha256": "f03d92fdb00b43dcd0f8a8a88db5170096659e75115079f05d4175bf834aab67"
+        },
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\run_final.log",
+          "sha256": "cb984e9443ea9729b5238402ba1ae457ee9455a0f491ccb8ec87b6d1ce481e95"
+        },
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\verification.json",
+          "sha256": "9bc7d48865e4694983ccff3c555e77801176c96b5e4d0419288c7f58f6098abb"
+        },
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\fit_exclusion_audit.csv",
+          "sha256": "4719e79d75cea2250e4181a96f1498f7554ff933ea8f83d9902157b36ca8f26f"
+        }
+      ]
+    },
+    {
+      "setting": "representative",
+      "heldout": "20260919_1100",
+      "excluded_date": "2026-09-19",
+      "training_recordings": [
+        "20260918_1100",
+        "20260911_1100",
+        "20260912_1100"
+      ],
+      "template_source_recordings": [
+        "20260904_1105",
+        "20260905_0426",
+        "20260905_1124",
+        "20260905_1900",
+        "20260911_1100",
+        "20260912_1100"
+      ],
+      "field_rows": [
+        1522,
+        1125,
+        1808
+      ],
+      "field_sha256": "d5e94a66446b75b2a49c4cc51543eccb6d4fc8ce13a25eebe7b0016709529afc",
+      "member_key": "lam0.8_r4_e2.5-26.0_ou-ou_dl0_dt1_sm0_s140",
+      "fit_settings": {
+        "ells": [
+          2.5,
+          26.0
+        ],
+        "kinds": [
+          "ou",
+          "ou"
+        ],
+        "rank": 4,
+        "steps": 140,
+        "threads": null,
+        "use_delay": false,
+        "use_delta": true,
+        "use_same_minute": false,
+        "verbose": false
+      },
+      "filename": "params_fully_excluded_20260919_1100_a7522d350e6acce6_lam0.8_r4_e2.5-26.0_ou-ou_dl0_dt1_sm0_s140.npz",
+      "legacy_path": "outputs/weekly_forecast_diagnostic/fit_cache/params_fully_excluded_20260919_1100_a7522d350e6acce6_lam0.8_r4_e2.5-26.0_ou-ou_dl0_dt1_sm0_s140.npz",
+      "sha256": "60ae666676a483bfe717469b160ca5226f6298aeace2dc315802b7f4c0b8e49c",
+      "creation_code_version": "unknown",
+      "creation_input_hashes": "unknown",
+      "provenance": "legacy_not_fully_verified",
+      "reconstructed_recipe_evidence": "field digest matches legacy key and fitting log",
+      "evidence": [
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\run.log",
+          "sha256": "f03d92fdb00b43dcd0f8a8a88db5170096659e75115079f05d4175bf834aab67"
+        },
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\run_final.log",
+          "sha256": "cb984e9443ea9729b5238402ba1ae457ee9455a0f491ccb8ec87b6d1ce481e95"
+        },
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\verification.json",
+          "sha256": "9bc7d48865e4694983ccff3c555e77801176c96b5e4d0419288c7f58f6098abb"
+        },
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\fit_exclusion_audit.csv",
+          "sha256": "4719e79d75cea2250e4181a96f1498f7554ff933ea8f83d9902157b36ca8f26f"
+        }
+      ]
+    },
+    {
+      "setting": "representative",
+      "heldout": "20260919_1100",
+      "excluded_date": "2026-09-19",
+      "training_recordings": [
+        "20260918_1100",
+        "20260911_1100",
+        "20260912_1100"
+      ],
+      "template_source_recordings": [
+        "20260904_1105",
+        "20260905_0426",
+        "20260905_1124",
+        "20260905_1900",
+        "20260911_1100",
+        "20260912_1100"
+      ],
+      "field_rows": [
+        1522,
+        1125,
+        1808
+      ],
+      "field_sha256": "36f288a5a19f2e1b2a38cc4164d3cfbbf8bad31f65e8eed1b25b7d7927e09e64",
+      "member_key": "lam0.7_r2_e3.0-12.0-60.0_ou-m32-ou_dl1_dt1_sm1_s140",
+      "fit_settings": {
+        "ells": [
+          3.0,
+          12.0,
+          60.0
+        ],
+        "kinds": [
+          "ou",
+          "m32",
+          "ou"
+        ],
+        "rank": 2,
+        "steps": 140,
+        "threads": null,
+        "use_delay": true,
+        "use_delta": true,
+        "use_same_minute": true,
+        "verbose": false
+      },
+      "filename": "params_fully_excluded_20260919_1100_82ce50ac6e970971_lam0.7_r2_e3.0-12.0-60.0_ou-m32-ou_dl1_dt1_sm1_s140.npz",
+      "legacy_path": "outputs/weekly_forecast_diagnostic/fit_cache/params_fully_excluded_20260919_1100_82ce50ac6e970971_lam0.7_r2_e3.0-12.0-60.0_ou-m32-ou_dl1_dt1_sm1_s140.npz",
+      "sha256": "614f23fab1023717a82379e446eefccee11158a6f8645bd19de4c85fb19ec900",
+      "creation_code_version": "unknown",
+      "creation_input_hashes": "unknown",
+      "provenance": "legacy_not_fully_verified",
+      "reconstructed_recipe_evidence": "field digest matches legacy key and fitting log",
+      "evidence": [
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\run.log",
+          "sha256": "f03d92fdb00b43dcd0f8a8a88db5170096659e75115079f05d4175bf834aab67"
+        },
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\run_final.log",
+          "sha256": "cb984e9443ea9729b5238402ba1ae457ee9455a0f491ccb8ec87b6d1ce481e95"
+        },
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\verification.json",
+          "sha256": "9bc7d48865e4694983ccff3c555e77801176c96b5e4d0419288c7f58f6098abb"
+        },
+        {
+          "path": "outputs\\weekly_forecast_diagnostic\\fit_exclusion_audit.csv",
+          "sha256": "4719e79d75cea2250e4181a96f1498f7554ff933ea8f83d9902157b36ca8f26f"
+        }
+      ]
+    }
+  ],
+  "warning": "Import fingerprints establish future compatibility only. Original fit execution/code/input provenance remains incomplete.",
+  "refit_policy": "No automatic GP fitting. Missing or mismatching assets stop evaluation."
+}

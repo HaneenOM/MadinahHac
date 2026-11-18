@@ -43,7 +43,14 @@ def fixed_benchmark(train,test,*,prefer_saved=True):
     return c,pd.DataFrame(labels),feeds
 
 
-def run(task,config,out,*,data_dir=None):
+def run(task,config,out,*,data_dir=None,allow_legacy_provenance=False):
+    if task=='forecast':
+        # Forecast evaluation must pass the provenance/context gate; never load
+        # arbitrary legacy NPZ files by name or refit on a cache miss.
+        if data_dir is not None and Path(data_dir).resolve()!=(ROOT/'data/raw').resolve():
+            raise ValueError('Use the documented data/raw release for sealed forecast evaluation')
+        from reliable_evaluation import run as reliable_run
+        return reliable_run('historical',out,allow_legacy_provenance,config,task='forecast')
     started=time.perf_counter();out=Path(out)
     # Protect previous evaluations as well as submissions: choose a new directory.
     if (out/'predictions.csv').exists():raise FileExistsError(f'Choose a new --output-dir: {out}')
@@ -155,6 +162,7 @@ def evaluate_im(test,config,out,started):
 if __name__=='__main__':
     parser=argparse.ArgumentParser();parser.add_argument('--task',choices=[*tasks.DEFAULT_CONFIG,'forecast-im'],required=True)
     parser.add_argument('--config',type=Path);parser.add_argument('--output-dir',type=Path,required=True)
+    parser.add_argument('--allow-legacy-provenance',action='store_true')
     args=parser.parse_args()
     cfg=json.loads(args.config.read_text(encoding='utf-8')) if args.config else tasks.default_config()
-    run(args.task,cfg,args.output_dir)
+    run(args.task,cfg,args.output_dir,allow_legacy_provenance=args.allow_legacy_provenance)
