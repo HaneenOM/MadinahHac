@@ -7,6 +7,19 @@ starter is preserved as `notebooks/starter-official.ipynb`.
 
 ## Collaborator setup
 
+### B-only CatBoost submission, explicitly requested (PROMPT 43)
+
+[The P43 report](reports/prompt43_catboost_b_only_ar.md) documents
+`outputs/submission_catboost_b_only_v1.csv`: the protected 0.806 baseline with
+only 284 Friday HIDDEN B values replaced using the frozen P42 B model/blend.
+The remaining 4,173 prediction strings, including original G and Saturday D,
+are exactly unchanged. Final fitting uses 2,014 eligible B examples from all
+released training recordings plus released September 19 observations. There
+was no new tuning, no default/production change and no automatic upload.
+This user-requested exploratory artifact does not reverse P42's validation
+conclusions. Builder: `src/build_catboost_b_only.py`; verification/model details
+are in `outputs/prompt43_catboost_b_only/`.
+
 ### Actual CatBoost Friday HIDDEN trial (PROMPT 42)
 
 [The P42 report](reports/prompt42_friday_catboost_ar.md) documents actual
