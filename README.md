@@ -1671,3 +1671,42 @@ Already examined dates and overlapping I-M proxy targets are not fresh
 independent validation. The new task evaluator reads the notebook-exported
 `task_config.json`; the legacy full-score command uses defaults and may refit
 missing historical caches, so it is not the safe task-specific entry point.
+
+### Prompt 35: improved D-now anchor for Saturday hidden-future (rejected)
+
+Run `scripts/run_hidden_future_d_anchor_trial.ps1` (`--diagnose-only` skips
+all fitting). Arabic report: `reports/prompt35_hidden_future_d_anchor_ar.md`;
+outputs: `outputs/hidden_future_d_anchor_trial/`. The accepted prayer direct
+model excludes D entirely and uses no reconstructed D history. Its only D-now
+estimate is the 25% fixed single-donor reference in the final blend. This trial
+replaces that component with the unchanged nonlinear D reconstructor, keeping
+the 75% prayer model and all settings fixed. No reconstructed features enter
+downstream training, so no in-sample stacking path is introduced.
+
+All models and preprocessing exclude the entire evaluation date. D is masked
+throughout each recording; reconstruction uses exact visible donors at now,
+never future target-time donors, with the previous >=2-donor fallback rule.
+Friday B/G remain unchanged (322 targets, 11 shared origins, MAE 3.872144).
+
+| Saturday recording | Targets / origins | Used / fallback | Current MAE | Anchor MAE | Current / anchor normalized |
+|---|---:|---:|---:|---:|---:|
+| Sep 12 11:00 | 160 / 11 | 160 / 0 | 5.495854 | 5.242204 | 0.552231 / 0.526744 |
+| Sep 5 04:26, separate relative-mask audit | 56 / 4 | 42 / 14 | 6.612951 | 6.894927 | 0.575821 / 0.600374 |
+| Sep 5 11:24 | 37 / 3 | 26 / 11 | 5.209067 | 6.789208 | 1.166238 / 1.520010 |
+| Sep 5 19:00 | 29 / 2 | 29 / 0 | 7.586332 | 6.647476 | 1.158048 / 1.014732 |
+
+The primary gain is 4.62%, but only 6/11 origins win and leave-one-origin-out
+gain ranges -0.083209 to +0.481148. Removing the 17:42 origin reverses the gain.
+Midday auxiliary origins never improve; morning also regresses. Morning has no
+clock overlap with the actual mask and is separately labeled as a start-relative
+transplant; midday/evening retain the previous clock-aligned protocol. The
+original fixed reference remains the normalization denominator. No time or
+horizon rule was selected after scoring. These are repeatedly examined dates,
+not fresh independent validation.
+
+Reject without tuning; no conditional full-score run or submission was created.
+All 282 combined D/future prediction checks and 564 separate prefix checks pass.
+Real input applicability is 162/162 Saturday D hidden-future targets, not an
+accuracy claim. Runtime was 17.66 seconds plus 0.61 seconds of additional checks.
+Zero T05 fit/inference; SHA-256 preserves 124 protected files, including the
+notebook, production code, baseline and independent D-only hidden candidate.
