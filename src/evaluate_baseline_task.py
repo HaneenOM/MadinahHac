@@ -43,7 +43,10 @@ def fixed_benchmark(train,test,*,prefer_saved=True):
     return c,pd.DataFrame(labels),feeds
 
 
-def run(task,config,out,*,data_dir=None,allow_legacy_provenance=False):
+def run(task,config,out,*,data_dir=None,allow_legacy_provenance=False,hidden_protocol='strict'):
+    if task=='hidden':
+        from hidden_evaluation import run as hidden_run
+        return hidden_run(config,out,data_dir=data_dir,protocol=hidden_protocol)
     if task=='forecast':
         # Forecast evaluation must pass the provenance/context gate; never load
         # arbitrary legacy NPZ files by name or refit on a cache miss.
@@ -163,6 +166,7 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser();parser.add_argument('--task',choices=[*tasks.DEFAULT_CONFIG,'forecast-im'],required=True)
     parser.add_argument('--config',type=Path);parser.add_argument('--output-dir',type=Path,required=True)
     parser.add_argument('--allow-legacy-provenance',action='store_true')
+    parser.add_argument('--hidden-protocol',choices=['strict','release_matched'],default='strict')
     args=parser.parse_args()
     cfg=json.loads(args.config.read_text(encoding='utf-8')) if args.config else tasks.default_config()
-    run(args.task,cfg,args.output_dir,allow_legacy_provenance=args.allow_legacy_provenance)
+    run(args.task,cfg,args.output_dir,allow_legacy_provenance=args.allow_legacy_provenance,hidden_protocol=args.hidden_protocol)

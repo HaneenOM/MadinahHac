@@ -1,10 +1,10 @@
 {
   "description": "Frozen T05 fitted covariance parameters used by the accepted submission; no raw observations or submission predictions.",
   "public_score": {
-    "value": 0.806,
+    "value": 0.8,
     "status": "user-reported historical Kaggle score, not local validation"
   },
-  "accepted_submission_sha256": "c7e0a0785fee013449b30a1041abdf939a58461bb5f359c5294e69b2c8ec6cd5",
+  "accepted_submission_sha256": "342af77dd40e4120b589485ecf02bf25bf3434650e81473692328903bcf67a4a",
   "inputs": {
     "train.csv": "3210a0b33212a60a888977848ec09f5f89bc0954bfd3b88e61fb9d840537f6f6",
     "test.csv": "6f2c6400b02964f3f37b912a5d6dbe085b28e7070a8094bdfad918e57766e6b9",
@@ -73,9 +73,12 @@
     "numpy": "2.5.5",
     "pandas": "3.1.1",
     "scikit-learn": "1.9.1",
-    "scipy": "1.18.1"
+    "scipy": "1.18.1",
+    "catboost": "1.2.10"
   },
   "python": "3.12",
   "prayer_source": "https://www.noor-deen.com/prayer-times/medina/",
-  "timezone": "Asia/Riyadh"
+  "timezone": "Asia/Riyadh",
+  "previous_0806_sha256": "c7e0a0785fee013449b30a1041abdf939a58461bb5f359c5294e69b2c8ec6cd5",
+  "hidden_recipe": "Rebuild B:269-tree CatBoost plus .5 old B; G:expanded Friday-weight3 dropout Ridge .5 sample; D:HGB train-only. Source hidden_bgd/hidden_catboost."
 }

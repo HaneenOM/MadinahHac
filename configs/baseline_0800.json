@@ -1,0 +1,54 @@
+{
+  "forecast": {
+    "model_weight": 1.0,
+    "im_max_three_age": 5,
+    "im_median_weight": 0.5
+  },
+  "hidden": {
+    "alpha": 3000.0,
+    "blends": {
+      "cam_B": [
+        "dropout",
+        0.75
+      ],
+      "cam_G": [
+        "dropout",
+        0.5
+      ],
+      "cam_D": [
+        "ridge",
+        0.5
+      ]
+    },
+    "d_only": false,
+    "recipe": "bgd_0800",
+    "catboost_iterations": 269,
+    "catboost_weight": 0.5,
+    "g_weight": 0.5
+  },
+  "hidden-future": {
+    "weight": 0.75,
+    "saturday_prayer": true,
+    "model_params": {
+      "loss": "absolute_error",
+      "max_iter": 100,
+      "learning_rate": 0.06,
+      "max_leaf_nodes": 12,
+      "min_samples_leaf": 40,
+      "random_state": 27
+    }
+  },
+  "missing": {
+    "min_gap": 6,
+    "weights": {
+      "cam_A": 1.0,
+      "cam_B": 1.0,
+      "cam_C": 1.0,
+      "cam_D": 0.0,
+      "cam_E": 1.0,
+      "cam_F": 0.5,
+      "cam_G": 1.0,
+      "cam_H": 0.0
+    }
+  }
+}

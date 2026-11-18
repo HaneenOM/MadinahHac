@@ -223,13 +223,15 @@ def forecast_predictions(cases,feeds,recs,setting,entries,config):
     return pd.DataFrame(rows),checks
 
 
-def task_predictions(cases,feeds,train,schedule,config):
+def task_predictions(cases,feeds,train,schedule,config,released=None):
     rows=[];checks=0
     import v2_hidden
     for (day,kind),today in cases.groupby(['day','kind'],sort=False):
         training=train[train.day.ne(day)].copy()
         assert day not in set(training.day)
-        if kind=='hidden':models=tasks.fit_hidden(training,config[kind],schedule)
+        if kind=='hidden':
+            extra=released[released.day.ne(day)] if released is not None else None
+            models=tasks.fit_hidden(training,config[kind],schedule,released=extra)
         elif kind=='hidden-future':models=tasks.fit_hidden_future(training,schedule,config[kind])
         else:models=tasks.fit_missing(training,config[kind])
         for r in today.itertuples():
@@ -340,7 +342,7 @@ def run(setting,out,allow_legacy=False,config=None,task='all'):
             results.append(values);checks+=n
         rest=cases[~cases.kind.eq('forecast')]
         if len(rest):
-            values,n=task_predictions(rest,feeds,train,schedule,cfg)
+            values,n=task_predictions(rest,feeds,train,schedule,cfg,released=test[test.id.isna()&test.people.notna()])
             results.append(values);checks+=n
     predictions=cases.merge(pd.concat(results,ignore_index=True),on='case_id',validate='one_to_one')
     summary,aggregate=summarize(predictions,labels,out,setting)
@@ -354,7 +356,8 @@ def run(setting,out,allow_legacy=False,config=None,task='all'):
         config=cfg,inputs=artifacts.context()['inputs'],versions=artifacts.environment(),
         task_training_folds={str(day):dict(excluded_date=str(day),
             recordings=sorted(train.loc[train.day.ne(day),'recording'].unique().tolist()),
-            preprocessing='Fit only on these recordings, no evaluation-date values')
+            hidden_extra_records=sorted(test.loc[test.id.isna()&test.people.notna()&test.day.ne(day),'recording'].unique().tolist()),
+            preprocessing='Train excludes evaluated date. Hidden B/G additionally fit genuinely released test rows excluding it; D fits train only. No production estimators loaded.')
             for day in cases.day.unique()} if setting=='historical' else {},
         case_fingerprints=fingerprints,
         output_case_files={n:artifacts.sha(out/n) for n in ('cases.csv','labels.csv')},

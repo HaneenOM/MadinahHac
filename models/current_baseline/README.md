@@ -1,5 +1,14 @@
 # Accepted baseline assets
 
+PROMPT45: current public score is **0.800, user reported**. The expected output
+hash in `manifest.json` is now
+`342af77dd40e4120b589485ecf02bf25bf3434650e81473692328903bcf67a4a`.
+The twelve covariance assets below are unchanged. B/G/D HIDDEN models are rebuilt
+from the tracked recipes `src/hidden_bgd.py` and `src/hidden_catboost.py` and the
+authorized released data, not loaded from ignored caches or submission CSVs.
+`manifest_0806.json` and `configs/baseline_0806.json` preserve the previous version.
+The remaining text below describes the original T05 asset provenance.
+
 These twelve `.npz` files are the fitted T05 GP covariance parameters from the
 accepted production cache (`outputs/t05_cache/params_without_{fri,sat}_*.npz`).
 They contain `ells`, `B`, `B0`, `sig2`, `s2_delta`, `ell_delta`, `Bn`, `tau`,

@@ -1,0 +1,81 @@
+{
+  "description": "Frozen T05 fitted covariance parameters used by the accepted submission; no raw observations or submission predictions.",
+  "public_score": {
+    "value": 0.806,
+    "status": "user-reported historical Kaggle score, not local validation"
+  },
+  "accepted_submission_sha256": "c7e0a0785fee013449b30a1041abdf939a58461bb5f359c5294e69b2c8ec6cd5",
+  "inputs": {
+    "train.csv": "3210a0b33212a60a888977848ec09f5f89bc0954bfd3b88e61fb9d840537f6f6",
+    "test.csv": "6f2c6400b02964f3f37b912a5d6dbe085b28e7070a8094bdfad918e57766e6b9",
+    "recordings.csv": "8fbed52f0ceda78fa5445c91c8ae15697284082d264190e2603bc20a141f72e9",
+    "sample_submission.csv": "22e1d6a23de7095c18be2e1e2d8dfbccaaa4010e647feee608e10f16ee798471"
+  },
+  "assets": {
+    "prayer_times_madinah.csv": "33d770d620f2df853cc7731e93db027b8c7401982079817f08d09ddaca294047",
+    "t05/params_without_fri_lam0.7_r2_e3.0-12.0-60.0_ou-m32-ou_dl1_dt1_sm1_s140.npz": "6386b2562e4b7939d3c1ea13b89e62b5b78555527d480e7f11d593c18d936240",
+    "t05/params_without_fri_lam0.8_r2_e2.0-8.0-90.0_ou-m32-ou_dl1_dt1_sm1_s140.npz": "9670d398b7a6b3dd01c012b7ba9f2fca9c8f3d79bd2428f5c726e67eec7208aa",
+    "t05/params_without_fri_lam0.8_r2_e3.0-12.0-60.0_ou-m32-ou_dl1_dt1_sm1_s140.npz": "5bb63a3bd6bebca8c7a1953f570ea3b202a4c68df2f049abf6043df1b0e53336",
+    "t05/params_without_fri_lam0.8_r2_e4.0-45.0_ou-ou_dl1_dt1_sm1_s140.npz": "2194f0f44420e3e9cd0b705e7fec21a501ecf9fe2ca916534c0d7fedeb02fa1f",
+    "t05/params_without_fri_lam0.8_r4_e2.0-13.0-33.0_ou-m32-ou_dl1_dt1_sm0_s140.npz": "99141c14e9c7d89b2dc4f60d90fbe31aace948f86319887521ebce0c3fd9e94c",
+    "t05/params_without_fri_lam0.8_r4_e2.5-26.0_ou-ou_dl0_dt1_sm0_s140.npz": "d74e230ebfb533228a25fc42c00944a368d1ba02e5195019ff2353418d2c92c0",
+    "t05/params_without_sat_lam0.7_r2_e3.0-12.0-60.0_ou-m32-ou_dl1_dt1_sm1_s140.npz": "3769d8a396d1d0ed0100788da2cb097030ff23f7f0cb815c7f2545d161c6d800",
+    "t05/params_without_sat_lam0.8_r2_e2.0-8.0-90.0_ou-m32-ou_dl1_dt1_sm1_s140.npz": "094753ece007edc507023f094b09eda2b4ad74ec3ad78acae1d5f85eccf48857",
+    "t05/params_without_sat_lam0.8_r2_e3.0-12.0-60.0_ou-m32-ou_dl1_dt1_sm1_s140.npz": "7c9211e462919104d6d6d856b946a862b8c79517535e1ff00353e94d7aa24f54",
+    "t05/params_without_sat_lam0.8_r2_e4.0-45.0_ou-ou_dl1_dt1_sm1_s140.npz": "9c6f9a9fc613414279fad0796f6c888761bba283714a71673bb7ead1481660fe",
+    "t05/params_without_sat_lam0.8_r4_e2.0-13.0-33.0_ou-m32-ou_dl1_dt1_sm0_s140.npz": "495c822c1213ccdc2c02e4a132e1db5d16f7364c15b03c573cef225aa6565da5",
+    "t05/params_without_sat_lam0.8_r4_e2.5-26.0_ou-ou_dl0_dt1_sm0_s140.npz": "2f45cdaa44f1603b626cbb6053ff212eed5b8636618c7d86467f7f567a8bff2c"
+  },
+  "config": {
+    "mode": "strict",
+    "steps": "140",
+    "members": [
+      {
+        "ells": "3,12,60",
+        "kinds": "ou,m32,ou"
+      },
+      {
+        "ells": "2,13,33",
+        "kinds": "ou,m32,ou",
+        "rank": "4",
+        "same": "0"
+      },
+      {
+        "ells": "2,8,90",
+        "kinds": "ou,m32,ou"
+      },
+      {
+        "ells": "4,45",
+        "kinds": "ou,ou",
+        "only_kinds": "forecast,missing"
+      },
+      {
+        "ells": "2.5,26",
+        "kinds": "ou,ou",
+        "rank": "4",
+        "same": "0",
+        "delay": "0",
+        "only_kinds": "forecast,missing"
+      },
+      {
+        "ells": "3,12,60",
+        "kinds": "ou,m32,ou",
+        "lam": "0.7",
+        "only_kinds": "forecast"
+      }
+    ],
+    "missing_direct": "0.25",
+    "w_hidden": "0.9",
+    "w_hidden-future": "0.85",
+    "keep_base_kinds": "hidden,hidden-future,missing"
+  },
+  "versions": {
+    "numpy": "2.5.5",
+    "pandas": "3.1.1",
+    "scikit-learn": "1.9.1",
+    "scipy": "1.18.1"
+  },
+  "python": "3.12",
+  "prayer_source": "https://www.noor-deen.com/prayer-times/medina/",
+  "timezone": "Asia/Riyadh"
+}

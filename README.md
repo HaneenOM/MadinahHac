@@ -7,6 +7,31 @@ starter is preserved as `notebooks/starter-official.ipynb`.
 
 ## Collaborator setup
 
+### Current baseline: 0.800, user-reported public score (PROMPT 45)
+
+`notebooks/current_baseline.ipynb` now defaults to the exact uploaded BGD method:
+Friday B CatBoost269 plus .5 previous-B blend, Friday G expanded Friday-weight3
+dropout Ridge, Saturday D nonlinear HGB. Other tasks retain their 0.806 methods.
+This public score is user reported, not an official local formula or private-score claim.
+
+```powershell
+py -3.12 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements-baseline.txt
+.\.venv\Scripts\python.exe scripts/run_current_baseline_notebook.py
+```
+
+Supply the four authorized inputs in `data/raw/`. Source, notebook, configs and
+the tracked `models/current_baseline/` assets suffice; no previous submission,
+ignored cache or fitted hidden estimator is needed. Small HIDDEN models refit
+from released tables; T05 loads its twelve tracked NPZs only.
+Output: `outputs/current_baseline_0800/submission_current_baseline.csv`.
+Expected SHA-256: `342af77dd40e4120b589485ecf02bf25bf3434650e81473692328903bcf67a4a`.
+Previous config: `configs/baseline_0806.json`; all old references/candidates remain separate.
+See [current teammate instructions](docs/teammate_baseline_0800.md) for editing,
+strict/release-matched evaluation, clean-copy testing and reproducing 0.806.
+Earlier sections below are historical decisions, including trials later promoted
+at the user's request after the reported public result.
+
 ### B-only CatBoost submission, explicitly requested (PROMPT 43)
 
 [The P43 report](reports/prompt43_catboost_b_only_ar.md) documents
@@ -94,11 +119,11 @@ reuse. Without the flag, with changed fingerprints, or with missing assets the
 run stops. No automatic 12-model refit occurs. The old full-score command and
 experiment commands below are historical records, not the recommended workflow.
 
-### Current accepted baseline: one notebook
+### Historical notebook organization (0.806, PROMPT 34)
 
-Open **`notebooks/current_baseline.ipynb`** for the accepted T05-based pipeline
+The following is the historical P34 setup for the T05-based pipeline
 whose historical public Kaggle score was **0.806 (user reported)**. This is
-the teammate entry point; the older commands and experiment sections below
+historical evidence; use the P45 setup above for the current notebook. The sections below
 document the project's history.
 
 After cloning, run from the repository root in PowerShell:

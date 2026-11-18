@@ -20,7 +20,8 @@ from im_forecast_fallback_trial import context, predict as predict_im
 DEFAULT_CONFIG = {
     'forecast': {'model_weight': 1., 'im_max_three_age': 5, 'im_median_weight': .5},
     'hidden': {'alpha': 3000., 'blends': {'cam_B': ['dropout', .75],
-        'cam_G': ['dropout', .5], 'cam_D': ['ridge', .5]}, 'd_only': False},
+        'cam_G': ['dropout', .5], 'cam_D': ['ridge', .5]}, 'd_only': False,
+        'recipe': 'bgd_0800', 'catboost_iterations':269, 'catboost_weight':.5,'g_weight':.5},
     'hidden-future': {'weight': .75, 'saturday_prayer': True,
         'model_params': {'loss': 'absolute_error', 'max_iter': 100,
             'learning_rate': .06, 'max_leaf_nodes': 12,
@@ -98,15 +99,20 @@ def predict_forecast(models, targets, config):
     return result
 
 
-def fit_hidden(training, config, schedule=None):
+def fit_hidden(training, config, schedule=None, released=None):
+    if config.get('recipe')=='bgd_0800' and config['d_only']:
+        raise ValueError('d_only is an archived standalone option; do not combine it with BGD.')
     models={'linear': v2_hidden.fit(table(training),alpha=config['alpha'])}
     if config['d_only']:
         import hidden_reconstruction_trial as nonlinear
         models['nonlinear'],_ = nonlinear.fit_new(training,schedule)
+    if config.get('recipe')=='bgd_0800':
+        import hidden_bgd
+        models['bgd']=hidden_bgd.fit(training,released,schedule,config)
     return models
 
 
-def hidden_value(t, unit, minute, models, config, reference=None, day=None, schedule=None, *, legacy_mix=False):
+def hidden_value(t, unit, minute, models, config, reference=None, day=None, schedule=None, *, legacy_mix=False, baseline_only=False):
     linear=models['linear']
     if reference is None:reference=v2_hidden.predict(t,unit,minute,linear,'single')[0]
     method,weight=config['blends'][unit]
@@ -118,6 +124,12 @@ def hidden_value(t, unit, minute, models, config, reference=None, day=None, sche
         x,available=nonlinear.make_features(raw,unit,[day],schedule)
         if available.iloc[0]>=2 and unit in models['nonlinear']:
             value=max(0.,float(models['nonlinear'][unit].predict(x)[0]))
+    if 'bgd' in models and not baseline_only:
+        import hidden_bgd
+        target=pd.DataFrame([dict(id='single',recording='single',unit=unit,day=day,minute_of_day=minute)])
+        values,_,_=hidden_bgd.predict(models['bgd'],target,{'single':t},{'single':reference},
+            {'single':float(value)},config,schedule)
+        value=values['single']
     return float(reference),float(value),float(fitted)
 
 
@@ -165,9 +177,16 @@ def predict_hidden(models,targets,feeds,references,config,schedule):
     for r in targets.itertuples():
         ref,value,fitted=hidden_value(feeds[r.recording],r.unit,int(r.minute_of_day),
             models,config,references[r.id],r.day,schedule,
-            legacy_mix=r.unit=='cam_G' and config['blends'][r.unit][1]==.5)
+            legacy_mix=r.unit=='cam_G' and config['blends'][r.unit][1]==.5,baseline_only=True)
         rows.append(dict(id=r.id,people=value,fitted=fitted))
-    return pd.DataFrame(rows)
+    result=pd.DataFrame(rows)
+    if 'bgd' in models:
+        import hidden_bgd
+        legacy=result.set_index('id').people.to_dict()
+        values,components,used=hidden_bgd.predict(models['bgd'],targets,feeds,references,legacy,config,schedule)
+        result['legacy_people']=result.people
+        result['people']=result.id.map(values);result['component']=result.id.map(components);result['used']=result.id.map(used)
+    return result
 
 
 def predict_hidden_future(models,targets,feeds,references,config,schedule):
