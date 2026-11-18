@@ -1710,3 +1710,39 @@ Real input applicability is 162/162 Saturday D hidden-future targets, not an
 accuracy claim. Runtime was 17.66 seconds plus 0.61 seconds of additional checks.
 Zero T05 fit/inference; SHA-256 preserves 124 protected files, including the
 notebook, production code, baseline and independent D-only hidden candidate.
+
+### Prompt 36: Friday B/G hidden-future review (diagnostic; close direction)
+
+Run `scripts/run_friday_hidden_future_diagnostic.ps1`. Arabic report:
+`reports/prompt36_friday_hidden_future_ar.md`; outputs:
+`outputs/friday_hidden_future_diagnostic/`. This review reuses the accepted
+322 September 11 predictions and 84 date-excluded September 4 predictions
+from the earlier Friday-arrival trial. No model fitting, tuning or new
+prediction is performed. The actual method is 75% direct HGB plus 25% fixed
+single-donor estimate at now, without Friday prayer features or B/G histories.
+
+| Recording / camera | Known / mask targets | Origins | MAE | Normalized | Signed bias |
+|---|---:|---:|---:|---:|---:|
+| Sep 4 B | 56/60 | 4 | 7.334129 | 0.585430 | -1.680144 |
+| Sep 4 G | 28/57 | 2 | 4.728633 | 1.172519 | -0.352997 |
+| Sep 11 B | 164/164 | 11 | 5.161389 | 0.639326 | -1.513941 |
+| Sep 11 G | 158/158 | 11 | 2.533940 | 0.802937 | -0.230241 |
+
+The single observable hypothesis reviewed was absence of the preferred donor
+at now. It does not explain B's main errors: D is always present on the long
+recording, and B's one old missing-D origin strongly favors the current model.
+G's three missing-E origins favor the reference, but two are small differences,
+the old recording has no E anywhere, and the long recording contributes only
+one such origin. Large G errors also occur with E present. Choosing a missing-E
+gate now would select a rule on repeatedly inspected evaluation errors, without
+independent training-only calibration. Previous timing/prayer and nonlinear
+hidden trials do not establish a different transferable Friday improvement.
+
+Per-camera/recording/horizon/window tables include MAE, normalized error, bias,
+coverage and leave-one-window-out results. There are only 15 nonoverlapping
+target intervals, 28 camera/origins and two dates, not 406 independent events.
+Sep 4 covers 11:05-14:30, lacks E, and has known G targets in only two origins;
+it cannot validate afternoon/evening behavior. Recommend closing this direction
+with the available evidence. No candidate, full-score run or submission was
+created. Runtime 1.74 seconds; all 812 hidden/future feature checks pass and
+SHA-256 preserves 148 protected files. Saturday and every other task stay unchanged.
