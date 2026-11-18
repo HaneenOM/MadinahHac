@@ -1555,3 +1555,38 @@ forecast cutoffs; fixed data, source and prior artifacts are SHA-256 protected.
 `D_by_*`, `D_recording_leave_one_window_out.csv`, `actual_D_time_audit.csv`,
 `full_task_comparison.csv`, `full_score_comparison.csv` and `verification.json`
 contain the full audit. `files_changed.txt` lists the exact new/modified files.
+
+### Prompt 31: training-only camera relationships (diagnostic; no forecast change)
+
+Run `scripts/run_camera_relationship_diagnostic.ps1`. The Arabic report is
+`reports/prompt31_camera_relationships_ar.md`; outputs and three SVG plots are
+in `outputs/camera_relationship_diagnostic/`. Only the six older training
+recordings on four dates enter discovery. No September 18–19 pseudo labels
+or test observations are loaded. Exact-minute observations retain gaps;
+1/5-minute changes require complete observed intervals. The screen covers
+synchronous associations and directional lags 1–15, plus residual changes
+after the existing lam=0.8 prayer-aligned template with the entire target
+date excluded from template construction/completion.
+
+A/F and B/G synchronous residual five-minute changes remain associated:
+median recording correlations 0.612/0.516 on 651/618 paired cells in five
+recordings, with positive signs in 23/24 and 24/25 qualifying 30-minute
+blocks. These overlapping pairs and temporal blocks are not independent
+recording replicates. E exists on only two training dates and has no usable
+independent residual-template coverage here. Morning September 5 also has
+no residual-template coverage. B/G are hidden together on the real Friday.
+
+No incremental lag passes the training-only gates. The strongest pooled
+partial correlation is A leading B by five minutes (0.252, 641 pairs), but
+only 14/23 blocks agree in sign, including 3/8 on September 12; September
+11's recording-level partial correlation is only 0.050. T05 already uses
+all-camera deviation histories, camera covariance and learned camera delays.
+No new predictor, T05 inference/refit, submission or recent-date MAE comparison
+was performed. Recommend moving to `missing`. Repeatedly examined September
+18–19 dates would not constitute fresh independent validation.
+
+The run took 189.34 seconds, plus 1.96 seconds to regenerate plot titles.
+SHA-256 checks preserve 213 existing protected files, including the 0.806
+baseline, separate D-only candidate, current notebook and production code.
+The user's updated result is that the D-only candidate had the same displayed
+public score as the baseline; its hidden-test benefit remains unknown.
