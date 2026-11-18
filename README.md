@@ -7,6 +7,18 @@ starter is preserved as `notebooks/starter-official.ipynb`.
 
 ## Collaborator setup
 
+### Actual CatBoost Friday HIDDEN trial (PROMPT 42)
+
+[The P42 report](reports/prompt42_friday_catboost_ar.md) documents actual
+CatBoost 1.2.10 training with MAE, date-aware development, inner early stopping,
+three small feature/depth configurations and separate B/G decisions. B improves
+the fixed strict/release-matched MAE by 5.04%/22.11%, but development Friday
+regresses and its strict gain disappears without its two best windows. G does
+not consistently beat P40. Neither replacement was adopted; no submission was
+created. CatBoost is optional in `requirements-catboost.txt`; production and
+notebook defaults do not import it. The isolated runner is
+`src/friday_catboost_trial.py`, with results in `outputs/prompt42_friday_catboost/`.
+
 ### Friday HIDDEN normalized-target trial (PROMPT 41)
 
 [The P41 report](reports/prompt41_friday_ratios_ar.md) distinguishes existing

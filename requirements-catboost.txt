@@ -1,0 +1,7 @@
+# Optional P42 Friday HIDDEN experiment; production does not import CatBoost.
+-r requirements-evaluation.txt
+catboost==1.2.10
+graphviz==0.21
+matplotlib==3.11.2
+plotly==7.1.0
+six==1.17.0
