@@ -1590,3 +1590,48 @@ SHA-256 checks preserve 213 existing protected files, including the 0.806
 baseline, separate D-only candidate, current notebook and production code.
 The user's updated result is that the D-only candidate had the same displayed
 public score as the baseline; its hidden-test benefit remains unknown.
+
+### Prompt 32: learned endpoint-preserving missing shape (rejected)
+
+Run `scripts/run_missing_shape_trial.ps1`; the Arabic report is
+`reports/prompt32_missing_shape_ar.md`. Results are isolated under
+`outputs/missing_shape_trial/`. One pooled regularized Ridge predicts the
+normalized departure from endpoint interpolation using gap geometry, exterior
+target slopes and exact released donor changes. A zero-at-endpoints envelope,
+fixed half-strength shrinkage and level-dependent bound preserve endpoints.
+This learns a residual response; it does not smooth existing donor corrections.
+
+Synthetic contiguous gaps transplant the fixed metadata availability patterns
+by camera/weekday, retaining donor masks and natural missingness. Each entire
+evaluation date is excluded from fitting, preprocessing and baseline donor
+calibration. The two folds use 175/141 synthetic gaps (1,557/1,338 targets),
+43 features and identical settings. Missing permits released after-gap context;
+no masked target or hidden/missing donor count is an input. All 76 endpoint
+checks and 358 unavailable/target-interior perturbation checks pass.
+
+The fixed benchmark remains 358 targets in 38 intervals. An explicit check
+found 32 fully labeled gaps and six partial gaps caused by natural missingness;
+all original cases are retained without inventing the absent labels.
+
+| Date | Targets / intervals | Current MAE | Shape MAE | Linear MAE | Current / shape normalized |
+|---|---:|---:|---:|---:|---:|
+| Sep 11 | 163 / 17 | 6.549358 | 8.028013 | 8.600943 | 0.761470 / 0.933388 |
+| Sep 12 | 195 / 21 | 4.191951 | 5.300601 | 5.569756 | 0.752627 / 0.951676 |
+
+The existing equal-date missing metric worsens 0.757049 to 0.942532.
+Pooled MAE worsens 5.265296 to 6.542412; equal-gap MAE 5.102759 to
+6.467337. On 300 changed targets in 33 intervals, current/candidate MAE
+is 4.946053/6.470078; 58 targets in five intervals retain current predictions.
+Only five gaps improve, 28 regress and five remain unchanged. Removing the
+two greatest total-error reductions still leaves a 1.488-person pooled MAE
+regression. A/E/F regress substantially. The 32 fully labeled gaps alone
+also regress on both dates. No scope or setting was revised after scoring.
+
+Actual input coverage is 326/375 A-H missing targets; all 89 I-M remain
+unsupported and unchanged. No camera-held-out transfer claim is made.
+These are already examined validation dates, not fresh independent evidence.
+Reject without tuning; no conditional full four-task run or submission was
+created. The successful process took 6.53 seconds (3.25 inside Python), plus
+0.32 seconds of saved-output/input checks. Two fold fits, zero T05 fits or
+inference. SHA-256 verification preserves 107 protected files including the
+0.806 baseline, D-only candidate, current notebook and fixed benchmark.
