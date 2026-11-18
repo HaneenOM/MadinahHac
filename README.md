@@ -7,6 +7,17 @@ starter is preserved as `notebooks/starter-official.ipynb`.
 
 ## Collaborator setup
 
+### Friday HIDDEN normalized-target trial (PROMPT 41)
+
+[The P41 report](reports/prompt41_friday_ratios_ar.md) distinguishes existing
+constant donor ratios and previously tested donor shares from a new normalized
+target Ridge. Date-aware development excludes September 11 entirely. The trial
+was rejected: neither camera passed development, G did not improve on P40, and
+B's release-matched gain disappeared after removing its two best windows.
+No new submission or production/default change was made. The standalone script
+is `src/friday_ratio_trial.py`; diagnostics and separate strict/release-matched
+tables are saved in `outputs/prompt41_friday_ratios/`.
+
 ### Friday-only HIDDEN candidate (PROMPT 40)
 
 [The P40 report](reports/prompt40_friday_hidden_ar.md) documents a separate
