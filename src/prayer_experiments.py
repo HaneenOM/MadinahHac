@@ -52,7 +52,7 @@ def extras(day, now, h, schedule, variant):
     return z[:1] if variant == 'clock' else z
 
 
-def fit_direct_variant(tables, rec_day, schedule, variant):
+def fit_direct_variant(tables, rec_day, schedule, variant, *, model_params=None):
     rows, labels = [], []
     for rec, t in tables.items():
         day = rec_day[rec]
@@ -71,8 +71,10 @@ def fit_direct_variant(tables, rec_day, schedule, variant):
     cols = DIRECT_COLS + (EXTRA[:1] if variant == 'clock' else EXTRA)
     X = pd.DataFrame(rows, columns=cols)
     used = X.columns[X.notna().any()].tolist()
-    model = HistGradientBoostingRegressor(loss='absolute_error', max_iter=100,
-        learning_rate=.06, max_leaf_nodes=12, min_samples_leaf=40, random_state=27)
+    params=dict(loss='absolute_error',max_iter=100,learning_rate=.06,
+                max_leaf_nodes=12,min_samples_leaf=40,random_state=27)
+    params.update(model_params or {})
+    model = HistGradientBoostingRegressor(**params)
     model.fit(X[used], labels)
     return model, used, cols
 

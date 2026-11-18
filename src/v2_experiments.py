@@ -50,7 +50,7 @@ def direct_feature(t,unit,now,h):
     return values
 
 
-def fit_direct(tables):
+def fit_direct(tables, *, model_params=None):
     rows=[]; labels=[]
     for t in tables.values():
         for unit in v2_hidden.PATTERNS:
@@ -68,8 +68,10 @@ def fit_direct(tables):
         return None
     X=pd.DataFrame(rows,columns=DIRECT_COLS)
     cols=X.columns[X.notna().any()].tolist()
-    model=HistGradientBoostingRegressor(loss='absolute_error',max_iter=100,
-            learning_rate=.06,max_leaf_nodes=12,min_samples_leaf=40,random_state=27)
+    params=dict(loss='absolute_error',max_iter=100,learning_rate=.06,
+                max_leaf_nodes=12,min_samples_leaf=40,random_state=27)
+    params.update(model_params or {})
+    model=HistGradientBoostingRegressor(**params)
     model.fit(X[cols],labels)
     return model,cols
 

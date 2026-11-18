@@ -1,7 +1,7 @@
-"""Reproduce the accepted 0.806 pipeline without any earlier submission CSVs.
+"""Frozen-asset preflight and backwards-compatible baseline entry point.
 
-Only the accepted builders run. Their optional paths leave legacy defaults intact.
-T05 loads the twelve frozen parameter sets; no ensemble fitting is allowed/needed.
+run delegates to the editable task workflow; run_legacy retains the archived
+builder chain for historical audit. Neither path refits the T05 ensemble.
 """
 from __future__ import annotations
 
@@ -55,7 +55,7 @@ def preflight(data_dir):
     return manifest, cfg
 
 
-def run(data_dir=None, output_dir=None):
+def run_legacy(data_dir=None, output_dir=None):
     """Generate fresh predictions in a dedicated directory and verify the saved file."""
     started = time.perf_counter()
     data_dir = Path(data_dir) if data_dir else ROOT / 'data/raw'
@@ -125,3 +125,9 @@ def run(data_dir=None, output_dir=None):
     print(json.dumps(verification, indent=2))
     print(f'Output: {destination.relative_to(ROOT)}')
     return verification
+
+
+def run(data_dir=None, output_dir=None):
+    """Task-level baseline; kept as an entry point for existing Python callers."""
+    from baseline_workflow import run as run_tasks
+    return run_tasks(data_dir=data_dir, output_dir=output_dir)

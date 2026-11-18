@@ -103,7 +103,7 @@ def prepare():
     print('Unique validation target readings:', cases[['recording', 'unit', 'minute']].drop_duplicates().shape[0])
 
 
-def predict(row):
+def predict(row, *, max_three_age=MAX_THREE_AGE, median_weight=.5):
     """Call T05's actual last-value routine, then apply one fixed alternative."""
     recent = np.full((6, 1), np.nan)
     for k in range(1, 4):
@@ -112,8 +112,11 @@ def predict(row):
             recent[int(minute-row['now']+5), 0] = value
     base = float(last_value(recent, 5)[-1, 0])
     eligible = bool(row['available'] >= 3 and np.isfinite(base)
-                    and row['now']-row['time3'] <= MAX_THREE_AGE)
-    new = .5*(base+float(np.median([row[f'value{k}'] for k in range(1, 4)]))) if eligible else base
+                    and row['now']-row['time3'] <= max_three_age)
+    median=float(np.median([row[f'value{k}'] for k in range(1, 4)]))
+    # Preserve the accepted arithmetic order for exact reproduction.
+    new = (.5*(base+median) if median_weight == .5 else
+           base+median_weight*(median-base)) if eligible else base
     return base, new, eligible
 
 

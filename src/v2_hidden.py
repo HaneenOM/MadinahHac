@@ -26,7 +26,7 @@ def _design(frame: pd.DataFrame, donors: list[str], med: pd.Series, dropout=Fals
     return z
 
 
-def fit(tables: dict[str,pd.DataFrame]):
+def fit(tables: dict[str,pd.DataFrame], *, alpha: float = 3000.):
     full=pd.concat(tables.values(),keys=tables.keys(),names=['recording','minute_of_day'])
     out={}
     for unit,masked in PATTERNS.items():
@@ -41,11 +41,11 @@ def fit(tables: dict[str,pd.DataFrame]):
         target=y.loc[valid]
         med=frame.median().fillna(0.)
         X=_design(frame,donors,med)
-        ridge=Ridge(alpha=3000.).fit(X,target)
+        ridge=Ridge(alpha=alpha).fit(X,target)
         augmented=[X]
         for seed in range(3):
             augmented.append(_design(frame,donors,med,dropout=True,seed=seed))
-        drop=Ridge(alpha=3000.).fit(pd.concat(augmented,ignore_index=True),
+        drop=Ridge(alpha=alpha).fit(pd.concat(augmented,ignore_index=True),
                                     np.tile(target.to_numpy(),4))
         pairs=[]
         for c in donors:

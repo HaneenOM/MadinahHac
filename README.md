@@ -30,10 +30,13 @@ Alternatively, execute that same notebook without a notebook editor:
 .\.venv\Scripts\python.exe scripts\run_current_baseline_notebook.py
 ```
 
-The new output is `outputs/current_baseline/submission_current_baseline.csv`.
-`verification.json`, `run.log`, and (for the command above)
-`current_baseline_executed.ipynb` are in the same directory. The original
-notebooks and submissions are preserved. Every run generates fresh predictions.
+The new output is `outputs/current_baseline_manual/submission_current_baseline.csv`.
+`verification.json`, editable `task_config.json`, and (for the command above)
+`current_baseline_executed.ipynb` are in the same directory. Existing submissions
+are preserved. Every run generates fresh predictions. The notebook now has eight
+numbered Arabic sections with separate configuration, loading/training and
+prediction cells for each task. See [the manual contribution guide](docs/teammate_baseline.md)
+for source functions, evaluation commands and saved-model limitations.
 
 The accepted path includes T05 forecast, the accepted I–M fallback, the accepted
 hidden donor/Ridge weights, Saturday prayer hidden-future, and v2 missing.
@@ -1635,3 +1638,36 @@ created. The successful process took 6.53 seconds (3.25 inside Python), plus
 0.32 seconds of saved-output/input checks. Two fold fits, zero T05 fits or
 inference. SHA-256 verification preserves 107 protected files including the
 0.806 baseline, D-only candidate, current notebook and fixed benchmark.
+
+### Prompt 34: editable teammate notebook, exact baseline preserved
+
+`notebooks/current_baseline.ipynb` now contains eight numbered Arabic sections,
+with task targets, visible-input/output examples, editable settings, separate
+model loading/training and prediction cells, source pointers and contribution
+instructions. See `docs/teammate_baseline.md` for all commands and limitations.
+`src/baseline_tasks.py` is the shared task implementation; the notebook and new
+`src/evaluate_baseline_task.py` call the same functions. Historical
+`local_score.fit_fold/predict_case` also delegates to these task functions.
+`baseline_workflow.py` handles file orchestration and the legacy decimal CSV
+round trips needed for exact compatibility. Historical builders remain for audit.
+
+Clean-kernel Run All took 37.58 seconds: all 4,457 IDs, finite nonnegative
+counts, zero unequal values, and the exact accepted SHA-256
+`c7e0a0785fee013449b30a1041abdf939a58461bb5f359c5294e69b2c8ec6cd5`.
+Outputs are under `outputs/current_baseline_manual/`, preserving previous files.
+D-only remains optional and off. No T05 model was refitted, no upload or commit
+was performed. An initial forecast last-bit mismatch was traced to GP target
+batch sizes and resolved by retaining the original batches; it was not waived.
+
+The four default per-task evaluations are in `outputs/prompt34_evaluation/`:
+hidden, hidden-future and missing match saved predictions exactly; forecast's
+maximum difference is 5.68e-14 from the shared blend arithmetic. A separate
+`--task forecast-im` proxy uses the same I-M function/settings without fitting.
+All 3,719 fixed cases, labels and feeds were also reconstructed exactly from
+raw inputs to verify the fresh-clone evaluation path. The forecast evaluation
+still requires the historical held-out sample96 covariance cache, which is not
+distributed with Git; it refuses to fit or use production assets in its place.
+Already examined dates and overlapping I-M proxy targets are not fresh
+independent validation. The new task evaluator reads the notebook-exported
+`task_config.json`; the legacy full-score command uses defaults and may refit
+missing historical caches, so it is not the safe task-specific entry point.

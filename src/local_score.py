@@ -17,6 +17,7 @@ from prayer_experiments import fit_direct_variant, predict_direct_variant, timet
 from t05_local_forecast import predict as predict_t05_forecast
 import v2_hidden
 import v2_missing
+import baseline_tasks as tasks
 
 OUT = ROOT / 'outputs' / 'local_score'
 DATES = ('2026-09-11', '2026-09-12')
@@ -104,55 +105,34 @@ def load_cases():
     return cases, table(feed)
 
 
-def fit_fold(train, day, schedule):
+def fit_fold(train, day, schedule, config=None):
     fit = train[train.day.ne(day)]
     assert day not in set(fit.day)
-    fit_tables = table(fit)
-    models = dict(
-        hidden=v2_hidden.fit(fit_tables),
-        direct=fit_direct(fit_tables),
-        missing=v2_missing.fit_calibration(fit_tables))
-    if day == '2026-09-12':
-        rec_day = fit.drop_duplicates('recording').set_index('recording').day.to_dict()
-        models['prayer_direct'] = fit_direct_variant(fit_tables, rec_day, schedule, 'prayer')
-    return models
+    config=config or tasks.default_config()
+    return dict(config=config,hidden_task=tasks.fit_hidden(fit,config['hidden'],schedule),
+        hf_task=tasks.fit_hidden_future(fit,schedule,config['hidden-future']),
+        missing=tasks.fit_missing(fit,config['missing']))
 
 
 def predict_case(r, t, models, t05_values, schedule):
     unit = r.unit
     minute = int(r.minute)
+    config=models.get('config',tasks.default_config())
     if r.kind == 'forecast':
         now = int(r.now); horizon = minute-now
         reference = feature(t, unit, now, horizon)[0]  # persistence
         model_value = t05_values[r.case_id]
         source = 't05_model' if np.isfinite(model_value) else 'reference_fallback'
-        prediction = model_value if np.isfinite(model_value) else reference
+        prediction = tasks.forecast_value(reference,model_value,config['forecast'])
     elif r.kind == 'hidden':
-        reference = v2_hidden.predict(t, unit, minute, models['hidden'], 'single')[0]
-        method, weight = HIDDEN_CANDIDATE[unit]
-        fitted = v2_hidden.predict(t, unit, minute, models['hidden'], method)[0]
-        prediction = reference + weight * (fitted-reference)
+        reference,prediction,_=tasks.hidden_value(t,unit,minute,models['hidden_task'],
+            config['hidden'],day=r.day,schedule=schedule)
     elif r.kind == 'hidden-future':
         now = int(r.now); horizon = minute-now
-        reference = predict_hf(t, unit, now, horizon, models['hidden'],
-                               models['direct'], 'fixed')
-        if r.day == '2026-09-12':
-            fitted = predict_direct_variant(t, unit, now, horizon, r.day,
-                                            schedule, models['prayer_direct'], 'prayer')
-        else:
-            fitted = predict_hf(t, unit, now, horizon, models['hidden'],
-                                models['direct'], 'direct')
-        prediction = reference + HF_WEIGHT * (fitted-reference)
+        reference,prediction,_=tasks.hidden_future_value(t,unit,now,horizon,r.day,
+            schedule,models['hf_task'],config['hidden-future'])
     else:
-        reference = v2_missing.predict(t, unit, minute, models['missing'], 'linear')[0]
-        prediction = reference
-        weight = MISSING_WEIGHT.get(unit, 0.)
-        if weight:
-            method = 'blend_full' if weight == 1. else 'blend'
-            fitted, available, gap = v2_missing.predict(
-                t, unit, minute, models['missing'], method, weight)
-            if np.isfinite(fitted) and gap >= 6 and available > 0:
-                prediction = fitted
+        reference,prediction,_=tasks.missing_value(t,unit,minute,models['missing'],config['missing'])
     if r.kind != 'forecast':
         source = 'v2'
     if not (np.isfinite(reference) and np.isfinite(prediction) and prediction >= 0):

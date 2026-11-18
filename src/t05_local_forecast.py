@@ -82,11 +82,9 @@ def predict(cases, feeds):
             tmpl = build_template(rec, prior, lam=member['lam'])
             tmpl, _ = complete_template(rec, tmpl, others, lam=member['lam'])
             params = heldout_params(recs, name, member)
-            predictions.append(gp.predict_recording(rec, tmpl, slope(tmpl), params, strict=True))
-        stack = np.stack(predictions)
-        counts = np.isfinite(stack).sum(axis=0)
-        mean = np.divide(np.nansum(stack, axis=0), counts,
-                         out=np.full(rec.y.shape, np.nan), where=counts > 0)
+            predictions.append((tmpl, slope(tmpl), params))
+        from baseline_tasks import condition_forecast
+        mean = condition_forecast(rec, predictions)
         for r in targets.itertuples():
             row, col = int(r.minute) - rec.first, rec.col(r.unit)
             values[r.case_id] = float(mean[row, col])

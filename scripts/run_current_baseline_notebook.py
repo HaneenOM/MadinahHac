@@ -8,7 +8,7 @@ import nbformat
 from nbclient import NotebookClient
 
 ROOT = Path(__file__).resolve().parents[1]
-kernel_root = ROOT / 'outputs/current_baseline/jupyter'
+kernel_root = ROOT / 'outputs/current_baseline_manual/jupyter'
 kernel = kernel_root / 'kernels/madinah-baseline'
 kernel.mkdir(parents=True, exist_ok=True)
 (kernel / 'kernel.json').write_text(json.dumps({
@@ -18,7 +18,7 @@ os.environ['JUPYTER_PATH'] = str(kernel_root) + os.pathsep + os.environ.get('JUP
 notebook = nbformat.read(ROOT / 'notebooks/current_baseline.ipynb', as_version=4)
 executed = NotebookClient(notebook, timeout=1800, kernel_name='madinah-baseline',
                           resources={'metadata': {'path': str(ROOT / 'notebooks')}}).execute()
-path = ROOT / 'outputs/current_baseline/current_baseline_executed.ipynb'
+path = ROOT / 'outputs/current_baseline_manual/current_baseline_executed.ipynb'
 nbformat.write(executed, path)
 print(path.relative_to(ROOT))
-print((ROOT / 'outputs/current_baseline/verification.json').read_text(encoding='utf-8'))
+print((ROOT / 'outputs/current_baseline_manual/verification.json').read_text(encoding='utf-8'))
