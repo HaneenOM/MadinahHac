@@ -5,6 +5,17 @@ This project uses the supplied 2026 release. Its four CSV files match the
 remain in the project root; `data/raw/` contains working copies. The official
 starter is preserved as `notebooks/starter-official.ipynb`.
 
+## Version 7 (user-confirmed public Kaggle score 0.724)
+
+`notebooks/version7.ipynb` documents the accepted V7 submission. Its settings, fingerprints, environment and model
+revisions are recorded in `configs/version7.json`, `models/version7/manifest.json` and
+`requirements_version7.txt`. Local reproduction has small numerical differences from the accepted file; see
+`docs/version7_reproduction_report.md`. The ongoing V7 development branch is `development/version7-improvements`.
+
+```powershell
+.\.venv_lab\Scripts\python.exe scripts\run_version7_notebook.py
+```
+
 ## Collaborator setup
 
 ### Forecast-tree stopping reassessment (PROMPT 50)

@@ -1,0 +1,82 @@
+{
+  "description": "Version 7 submission: input files, frozen assets, environments and pretrained models it was built and verified with.",
+  "public_score": {
+    "value": 0.724,
+    "status": "user-reported public Kaggle score (uploaded 18 Nov 2026), not local validation"
+  },
+  "local_score": {
+    "fixed": 0.7038,
+    "mirror": 0.7284,
+    "status": "local team test sets, not a board forecast"
+  },
+  "accepted_submission_sha256": "2eced7c2ea9765d93d798fc0130126a523e51e69b1fb4ac5bf6d5783d81cc88c",
+  "settings": "configs/version7.json",
+  "inputs": {
+    "train.csv": "3210a0b33212a60a888977848ec09f5f89bc0954bfd3b88e61fb9d840537f6f6",
+    "test.csv": "6f2c6400b02964f3f37b912a5d6dbe085b28e7070a8094bdfad918e57766e6b9",
+    "recordings.csv": "8fbed52f0ceda78fa5445c91c8ae15697284082d264190e2603bc20a141f72e9",
+    "sample_submission.csv": "22e1d6a23de7095c18be2e1e2d8dfbccaaa4010e647feee608e10f16ee798471"
+  },
+  "assets": {
+    "models/current_baseline/prayer_times_madinah.csv": "33d770d620f2df853cc7731e93db027b8c7401982079817f08d09ddaca294047",
+    "models/current_baseline/t05/params_without_fri_lam0.7_r2_e3.0-12.0-60.0_ou-m32-ou_dl1_dt1_sm1_s140.npz": "6386b2562e4b7939d3c1ea13b89e62b5b78555527d480e7f11d593c18d936240",
+    "models/current_baseline/t05/params_without_fri_lam0.8_r2_e2.0-8.0-90.0_ou-m32-ou_dl1_dt1_sm1_s140.npz": "9670d398b7a6b3dd01c012b7ba9f2fca9c8f3d79bd2428f5c726e67eec7208aa",
+    "models/current_baseline/t05/params_without_fri_lam0.8_r2_e3.0-12.0-60.0_ou-m32-ou_dl1_dt1_sm1_s140.npz": "5bb63a3bd6bebca8c7a1953f570ea3b202a4c68df2f049abf6043df1b0e53336",
+    "models/current_baseline/t05/params_without_fri_lam0.8_r2_e4.0-45.0_ou-ou_dl1_dt1_sm1_s140.npz": "2194f0f44420e3e9cd0b705e7fec21a501ecf9fe2ca916534c0d7fedeb02fa1f",
+    "models/current_baseline/t05/params_without_fri_lam0.8_r4_e2.0-13.0-33.0_ou-m32-ou_dl1_dt1_sm0_s140.npz": "99141c14e9c7d89b2dc4f60d90fbe31aace948f86319887521ebce0c3fd9e94c",
+    "models/current_baseline/t05/params_without_fri_lam0.8_r4_e2.5-26.0_ou-ou_dl0_dt1_sm0_s140.npz": "d74e230ebfb533228a25fc42c00944a368d1ba02e5195019ff2353418d2c92c0",
+    "models/current_baseline/t05/params_without_sat_lam0.7_r2_e3.0-12.0-60.0_ou-m32-ou_dl1_dt1_sm1_s140.npz": "3769d8a396d1d0ed0100788da2cb097030ff23f7f0cb815c7f2545d161c6d800",
+    "models/current_baseline/t05/params_without_sat_lam0.8_r2_e2.0-8.0-90.0_ou-m32-ou_dl1_dt1_sm1_s140.npz": "094753ece007edc507023f094b09eda2b4ad74ec3ad78acae1d5f85eccf48857",
+    "models/current_baseline/t05/params_without_sat_lam0.8_r2_e3.0-12.0-60.0_ou-m32-ou_dl1_dt1_sm1_s140.npz": "7c9211e462919104d6d6d856b946a862b8c79517535e1ff00353e94d7aa24f54",
+    "models/current_baseline/t05/params_without_sat_lam0.8_r2_e4.0-45.0_ou-ou_dl1_dt1_sm1_s140.npz": "9c6f9a9fc613414279fad0796f6c888761bba283714a71673bb7ead1481660fe",
+    "models/current_baseline/t05/params_without_sat_lam0.8_r4_e2.0-13.0-33.0_ou-m32-ou_dl1_dt1_sm0_s140.npz": "495c822c1213ccdc2c02e4a132e1db5d16f7364c15b03c573cef225aa6565da5",
+    "models/current_baseline/t05/params_without_sat_lam0.8_r4_e2.5-26.0_ou-ou_dl0_dt1_sm0_s140.npz": "2f45cdaa44f1603b626cbb6053ff212eed5b8636618c7d86467f7f567a8bff2c"
+  },
+  "pretrained_models": {
+    "chronos-2": {
+      "repo": "amazon/chronos-2",
+      "revision": "29ec3766d36d6f73f0696f85560a422f50e8498c",
+      "files": {
+        "config.json": "ef1143bfdc9c0376d9a056eefca46cb4b1ec3d0ffacd541ff56feb40fb708031",
+        "model.safetensors": "ddcda3c7508bf2528087723e98a20707cc04b7f370ae275a9fd88078ddba4f42"
+      },
+      "library": "chronos-forecasting 2.3.2",
+      "licence": "Apache-2.0",
+      "used_for": "forecast, cameras B C D G H (share 0.25)"
+    },
+    "tabicl-v2": {
+      "repo": "jingang/TabICL",
+      "revision": "4dcd344ece2c00be9e831fdd35bed57b5ad83e19",
+      "files": {
+        "tabicl-regressor-v2-20260212.ckpt": "0db9cb538f114e79026bf08f45f41ad8dd7ad2de2aaca9a5ca8cd3bd9748ae7a"
+      },
+      "library": "tabicl 2.2.0",
+      "licence": "BSD-3-Clause",
+      "used_for": "hidden, cameras B (0.33) and D (0.20)"
+    }
+  },
+  "versions": {
+    "numpy": "2.5.5",
+    "pandas": "3.1.1",
+    "scipy": "1.18.1",
+    "scikit-learn": "1.9.1",
+    "torch": "2.15.0",
+    "catboost": "1.2.10",
+    "threadpoolctl": "3.8.0",
+    "chronos-forecasting": "2.3.2",
+    "tabicl": "2.2.0",
+    "transformers": "5.23.0",
+    "accelerate": "1.16.0",
+    "huggingface-hub": "2.4.0",
+    "safetensors": "0.8.0",
+    "einops": "0.8.2"
+  },
+  "environments": {
+    ".venv": "requirements.txt plus catboost 1.2.10 and matplotlib 3.11.2 (team environment; the original build ran its non-library steps here)",
+    ".venv_lab": "requirements_version7.txt (all steps; the verified notebook run used this environment only)"
+  },
+  "python": "3.12.14",
+  "platform": "Windows 11, CPU",
+  "prayer_source": "https://www.noor-deen.com/prayer-times/medina/",
+  "timezone": "Asia/Riyadh"
+}

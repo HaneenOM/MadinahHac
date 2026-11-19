@@ -72,8 +72,7 @@ def forecast_output(project,models,config):
 def hidden_output(project,predictions,config):
     # The old v2 stage used these original weights before the accepted B/D update.
     from v2_candidate import HIDDEN
-    fitted=predictions.set_index('id').copy();initial={}
-    if 'legacy_people' in fitted:fitted['people']=fitted.legacy_people
+    fitted=predictions.set_index('id');initial={}
     targets=task_targets(project,'hidden')
     for r in targets.itertuples():
         old_weight=HIDDEN[r.unit][1];ref=project['references'][r.id]
@@ -87,14 +86,6 @@ def hidden_output(project,predictions,config):
         new=float(fitted.at[r.id,'people'])
         if (changed_weight or optional) and abs(new-float(values[r.id]))>1e-9:
             values[r.id]=str(new)
-    if config.get('recipe')=='bgd_0800':
-        promoted=predictions.set_index('id')
-        for r in targets.itertuples():
-            if not promoted.at[r.id,'used']:continue
-            new=float(promoted.at[r.id,'people'])
-            if r.unit=='cam_B':
-                anchor=float(values[r.id]);new=max(0.,anchor+config['catboost_weight']*(float(promoted.at[r.id,'component'])-anchor))
-            if r.unit!='cam_D' or abs(new-float(values[r.id]))>1e-9:values[r.id]=str(new)
     return as_frame(values)
 
 
@@ -158,21 +149,18 @@ def save_combined(project,task_frames,config,output,*,verify_accepted=True,
     payload=stream.getvalue().encode('utf-8')
     import hashlib
     digest=hashlib.sha256(payload).hexdigest()
-    promoted=config['hidden'].get('recipe')=='bgd_0800'
-    expected=project['manifest']['accepted_submission_sha256'] if promoted else project['manifest']['previous_0806_sha256']
+    expected=project['manifest']['accepted_submission_sha256']
     if config['hidden']['d_only'] and verify_accepted:
         raise ValueError('D-only is a separate candidate: disable verify_accepted and choose a new filename.')
-    from current_baseline import PREVIOUS_REFERENCE
-    reference_path=REFERENCE if promoted else PREVIOUS_REFERENCE
     report=dict(ids=len(ids),valid_nonnegative=True,t05_parameter_sets=12,t05_models_fitted=0,
         d_only_enabled=config['hidden']['d_only'],output_sha256=digest,expected_sha256=expected,
-        sha256_matches_accepted=digest==expected,reference_available=reference_path.exists())
-    if reference_path.exists():
-        with reference_path.open(newline='',encoding='utf-8') as handle:old=list(csv.DictReader(handle))
+        sha256_matches_accepted=digest==expected,reference_available=REFERENCE.exists())
+    if REFERENCE.exists():
+        with REFERENCE.open(newline='',encoding='utf-8') as handle:old=list(csv.DictReader(handle))
         assert [r['id'] for r in old]==ids
         differences=np.array([abs(float(collected[r['id']])-float(r['people'])) for r in old])
         metadata=project['targets'].set_index('id').kind
-        report.update(reference_sha256=sha256(reference_path),max_absolute_difference=float(differences.max()),
+        report.update(reference_sha256=sha256(REFERENCE),max_absolute_difference=float(differences.max()),
             unequal_values=int((differences!=0).sum()),mismatches_over_1e_9=int((differences>1e-9).sum()),
             by_task={kind:dict(targets=int(metadata.eq(kind).sum()),
                 unequal_values=sum(collected[r['id']] and float(collected[r['id']])!=float(r['people'])
@@ -197,14 +185,14 @@ def save_combined(project,task_frames,config,output,*,verify_accepted=True,
     return report
 
 
-def run(data_dir=None,output_dir=None,config=None):
+def run(data_dir=None,output_dir=None):
     """CLI compatibility; the notebook calls these steps in separate task cells."""
     started=time.perf_counter();protected=snapshot_protected()
     project=load_project(Path(data_dir) if data_dir else ROOT/'data/raw')
-    config=config or tasks.default_config();schedule=load_schedule(project)
+    config=tasks.default_config();schedule=load_schedule(project)
     models=tasks.load_forecast(Path(data_dir) if data_dir else ROOT/'data/raw',ASSETS,project['frozen_config'])
     forecast=forecast_output(project,models,config['forecast'])
-    hidden=tasks.fit_hidden(project['train'],config['hidden'],schedule,released=project['test'])
+    hidden=tasks.fit_hidden(project['train'],config['hidden'],schedule)
     hp=tasks.predict_hidden(hidden,task_targets(project,'hidden'),project['feeds'],project['references'],config['hidden'],schedule)
     hf=tasks.fit_hidden_future(project['train'],schedule,config['hidden-future'])
     hfp=tasks.predict_hidden_future(hf,task_targets(project,'hidden-future'),project['feeds'],project['references'],config['hidden-future'],schedule)
@@ -212,18 +200,5 @@ def run(data_dir=None,output_dir=None,config=None):
     mp=tasks.predict_missing(missing,task_targets(project,'missing'),project['feeds'],project['references'],config['missing'])
     return save_combined(project,{'forecast':forecast,'hidden':hidden_output(project,hp,config['hidden']),
         'hidden-future':hidden_future_output(project,hfp,hf,config['hidden-future']),
-        'missing':missing_output(project,mp)},config,output_dir or ROOT/'outputs/current_baseline_0800',
+        'missing':missing_output(project,mp)},config,output_dir or ROOT/'outputs/current_baseline_manual',
         protected=protected,started=started)
-
-
-if __name__=='__main__':
-    import argparse
-    from threadpoolctl import threadpool_limits
-    parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--config',type=Path)
-    parser.add_argument('--output-dir',type=Path,required=True)
-    parser.add_argument('--data-dir',type=Path)
-    args=parser.parse_args()
-    config=json.loads(args.config.read_text()) if args.config else None
-    with threadpool_limits(limits=4):
-        print(json.dumps(run(args.data_dir,args.output_dir,config),indent=2))

@@ -1,0 +1,8 @@
+{
+  "base_submission":"outputs/version7/reference/submission_v7_board_0.724.csv",
+  "base_sha256":"2eced7c2ea9765d93d798fc0130126a523e51e69b1fb4ac5bf6d5783d81cc88c",
+  "changes":[{"mission":"hidden","cameras":["cam_G","cam_D"],"module":"noran/tracks/p56_hidden_gd/model.py","rule":"3-minute triangular smoothing in log1p space; same minute grid and released donor availability"}],
+  "numeric_recipe":"accepted_reference + (smoothed_local_V7 - local_V7), preserving the original prediction text outside the selected HIDDEN scope",
+  "scope_selection":"fixed-development positive gain after deleting best two windows, recorded before inspecting mirror/testday results",
+  "promotion":"none; candidate generation requires supporting assessment results"
+}

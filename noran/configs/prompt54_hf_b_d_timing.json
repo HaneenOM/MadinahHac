@@ -1,0 +1,12 @@
+{
+  "label": "prompt54_hf_b_d_timing",
+  "mission": "hidden-future",
+  "module": "noran/tracks/hf_b_d_timing/model.py",
+  "base": "configs/version7.json",
+  "supported_camera": "cam_B",
+  "only_change": "SHIFT_CAMS=(cam_D,) for B with at least five visible D observations in the existing trailing 20-minute shift window, outside the unchanged plateau rule",
+  "development": "fixed",
+  "assessment": ["mirror", "testday"],
+  "selection_policy": "one predeclared experiment; no assessment-dependent settings or camera exceptions",
+  "limitations": "All dates were examined previously. Protocols share recording dates and events. This is exploratory, not independent validation."
+}

@@ -1,0 +1,11 @@
+{
+  "_note": "v6 = v5 with version 3 of the hidden model (noran/tracks/hidden_v3): the week-analog joins as one more equal member, and camera B is averaged with the accepted value where camera D stands far above the others (the independent checker's request). Forecast = equal average of the accepted forecast and the forecast track. Hidden-future = noran/tracks/hf_final. Missing = noran/tracks/missing.",
+  "forecast": {
+    "local_values_csv": "outputs/noran/forecast_blend/w0.5/fixed_values.csv",
+    "mirror_values_csv": "outputs/noran/forecast_blend/w0.5/mirror_values.csv",
+    "test_values_csv": "outputs/noran/forecast_blend/w0.5/test_values.csv"
+  },
+  "hidden": {"track_module": "noran/tracks/hidden_v3/model.py"},
+  "hidden-future": {"track_module": "noran/tracks/hf_final/model.py"},
+  "missing": {"track_module": "noran/tracks/missing/model.py"}
+}

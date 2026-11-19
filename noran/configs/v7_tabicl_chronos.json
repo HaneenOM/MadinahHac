@@ -1,0 +1,11 @@
+{
+  "_note": "v7 = v6 + two library additions that won on every case set: forecast = 0.75 x (v6 forecast) + 0.25 x Chronos-2 for cameras B, C, D, G, H only (checker's setting, outputs/noran/tracks/lib_forecast_verify/blend_others_w0.25_*); hidden = noran/tracks/hidden_v4 (hidden_v3 + TabICL v2 for B 0.33 and D 0.20). Needs .venv_lab for the hidden model.",
+  "forecast": {
+    "local_values_csv": "outputs/noran/tracks/lib_forecast_verify/blend_others_w0.25_fixed_values.csv",
+    "mirror_values_csv": "outputs/noran/tracks/lib_forecast_verify/blend_others_w0.25_mirror_values.csv",
+    "test_values_csv": "outputs/noran/tracks/lib_forecast_verify/blend_others_w0.25_test_values.csv"
+  },
+  "hidden": {"track_module": "noran/tracks/hidden_v4/model.py"},
+  "hidden-future": {"track_module": "noran/tracks/hf_final/model.py"},
+  "missing": {"track_module": "noran/tracks/missing/model.py"}
+}

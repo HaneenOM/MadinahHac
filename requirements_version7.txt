@@ -1,0 +1,18 @@
+# Version 7 environment = the team's requirements.txt plus the packages below.
+# Verified on Windows 11, Python 3.12, CPU only (19 Nov 2026).
+-r requirements.txt
+catboost==1.2.10
+matplotlib==3.11.2
+chronos-forecasting==2.3.2
+tabicl==2.2.0
+transformers==5.23.0
+accelerate==1.16.0
+huggingface-hub==2.4.0
+safetensors==0.8.0
+einops==0.8.2
+threadpoolctl==3.8.0
+#
+# Pretrained models (downloaded once by notebooks/version7.ipynb section 1, then read offline):
+#   Chronos-2  amazon/chronos-2, revision 29ec3766d36d6f73f0696f85560a422f50e8498c, Apache-2.0
+#   TabICL v2  jingang/TabICL, file tabicl-regressor-v2-20260212.ckpt,
+#              revision 4dcd344ece2c00be9e831fdd35bed57b5ad83e19, BSD-3-Clause

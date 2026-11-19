@@ -1,0 +1,7 @@
+{
+  "module":"noran/tracks/p56_forecast_im_select/model.py",
+  "base":"noran/configs/prompt56_forecast_im.json",
+  "selection":"On fitting recordings only, leave one contiguous released block out; select a camera only with >=4 blocks, positive OOF gain, and positive gain after removing its best block.",
+  "revision_reason":"Unconditional pooled residuals improved some cameras but harmed others; test a training-only applicability rule rather than selecting named cameras on assessment answers.",
+  "status":"Exploratory second recipe after inspection of first recipe results; previously examined dates are reused, not independent confirmation."
+}

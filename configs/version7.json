@@ -1,0 +1,30 @@
+{
+  "forecast": {
+    "track_weight": 0.5,
+    "chronos_variant": "c2_lr_long_aef",
+    "chronos_weight": 0.25,
+    "chronos_cameras": "BCDGH"
+  },
+  "hidden": {
+    "track_module": "noran/tracks/hidden_v4/model.py",
+    "label": "hidden_v4",
+    "tabicl_share": {
+      "cam_B": 0.33,
+      "cam_D": 0.2,
+      "cam_G": 0.0
+    }
+  },
+  "hidden-future": {
+    "track_module": "noran/tracks/hf_final/model.py",
+    "label": "hf_final"
+  },
+  "missing": {
+    "track_module": "noran/tracks/missing/model.py",
+    "label": "missing"
+  },
+  "assembly": {
+    "base_config": "noran/configs/v6_hidden_v3.json",
+    "base_name": "v6_hidden_v3",
+    "candidate_name": "version7"
+  }
+}

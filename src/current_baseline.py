@@ -23,8 +23,7 @@ from v2_candidate import build as build_v2
 
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / 'models/current_baseline'
-REFERENCE = ROOT / 'outputs/submission_hidden_bgd_v1.csv'
-PREVIOUS_REFERENCE = ROOT / 'outputs/submission_t05_hidden_hidden_future_im_fallback_v1.csv'
+REFERENCE = ROOT / 'outputs/submission_t05_hidden_hidden_future_im_fallback_v1.csv'
 
 
 def sha256(path):
@@ -62,7 +61,6 @@ def run_legacy(data_dir=None, output_dir=None):
     data_dir = Path(data_dir) if data_dir else ROOT / 'data/raw'
     out = Path(output_dir) if output_dir else ROOT / 'outputs/current_baseline'
     manifest, cfg = preflight(data_dir)
-    manifest=json.loads((ASSETS/'manifest_0806.json').read_text(encoding='utf-8'))
     out.mkdir(parents=True, exist_ok=True)
     protected = {p: sha256(p) for p in (ROOT / 'outputs').glob('submission*.csv')}
     protected.update({p: sha256(p) for p in (ROOT / 'notebooks').glob('starter*.ipynb')})
@@ -100,12 +98,12 @@ def run_legacy(data_dir=None, output_dir=None):
                         output_sha256=actual_sha,
                         expected_sha256=manifest['accepted_submission_sha256'],
                         sha256_matches_accepted=actual_sha == manifest['accepted_submission_sha256'],
-                        reference_available=PREVIOUS_REFERENCE.exists())
-    if PREVIOUS_REFERENCE.exists():
-        expected = {r['id']: float(r['people']) for r in read_submission(PREVIOUS_REFERENCE, ids)}
+                        reference_available=REFERENCE.exists())
+    if REFERENCE.exists():
+        expected = {r['id']: float(r['people']) for r in read_submission(REFERENCE, ids)}
         difference = np.array([abs(float(r['people']) - expected[r['id']]) for r in actual])
         kinds = pd.read_csv(data_dir / 'test.csv').dropna(subset=['id']).set_index('id').kind
-        verification.update(reference_sha256=sha256(PREVIOUS_REFERENCE),
+        verification.update(reference_sha256=sha256(REFERENCE),
                             max_absolute_difference=float(difference.max()),
                             unequal_values=int((difference != 0).sum()),
                             mismatches_over_1e_9=int((difference > 1e-9).sum()),

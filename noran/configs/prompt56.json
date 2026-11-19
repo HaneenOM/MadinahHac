@@ -1,0 +1,8 @@
+{
+  "baseline": "version7",
+  "development": "fixed",
+  "assessment": ["mirror", "testday"],
+  "hidden_smooth": {"module":"noran/tracks/p56_hidden_smooth/model.py", "weights":[1,2,1],"space":"log1p","radius_minutes":1,"minimum_visible_donors":2},
+  "missing_convex": {"module":"noran/tracks/p56_missing_convex/model.py", "scope":"ABCDEFGH", "constraints":"weights >= 0 and sum(weights) <= 1", "other_settings":"Version 7 unchanged"},
+  "policy":"One recipe per hypothesis, locked before assessment. Previously examined dates; exploratory reused local evidence. No automatic promotion."
+}

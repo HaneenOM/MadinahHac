@@ -20,8 +20,7 @@ from im_forecast_fallback_trial import context, predict as predict_im
 DEFAULT_CONFIG = {
     'forecast': {'model_weight': 1., 'im_max_three_age': 5, 'im_median_weight': .5},
     'hidden': {'alpha': 3000., 'blends': {'cam_B': ['dropout', .75],
-        'cam_G': ['dropout', .5], 'cam_D': ['ridge', .5]}, 'd_only': False,
-        'recipe': 'bgd_0800', 'catboost_iterations':269, 'catboost_weight':.5,'g_weight':.5},
+        'cam_G': ['dropout', .5], 'cam_D': ['ridge', .5]}, 'd_only': False},
     'hidden-future': {'weight': .75, 'saturday_prayer': True,
         'model_params': {'loss': 'absolute_error', 'max_iter': 100,
             'learning_rate': .06, 'max_leaf_nodes': 12,
@@ -99,20 +98,76 @@ def predict_forecast(models, targets, config):
     return result
 
 
-def fit_hidden(training, config, schedule=None, released=None):
-    if config.get('recipe')=='bgd_0800' and config['d_only']:
-        raise ValueError('d_only is an archived standalone option; do not combine it with BGD.')
+# --- optional track modules (off in the accepted baseline) ----------------------------------
+# A mission's settings may name a module that follows the contract of noran/track_eval.py
+# (fit(training, day, context) and predict(case, t, model, context)):
+#     config[mission]['track_module'] = 'noran/tracks/<key>/model.py'
+# Wherever that module returns a finite number it replaces the accepted value; NaN keeps it.
+_TRACK_CACHE={}
+_TRAIN_DATES=('2026-09-04','2026-09-05','2026-09-11','2026-09-12')
+
+
+def _track_load(path):
+    import importlib.util,sys
+    from pipeline import ROOT
+    full=(ROOT/path).resolve()
+    key=('module',str(full))
+    if key not in _TRACK_CACHE:
+        spec=importlib.util.spec_from_file_location(f'track_{full.parent.name}_{full.stem}',full)
+        module=importlib.util.module_from_spec(spec)
+        if str(full.parent) not in sys.path:sys.path.insert(0,str(full.parent))
+        spec.loader.exec_module(module)
+        _TRACK_CACHE[key]=module
+    return _TRACK_CACHE[key]
+
+
+def _track_context(mission,schedule):
+    from pipeline import ROOT
+    if 'released' not in _TRACK_CACHE:
+        test=pd.read_csv(ROOT/'data/raw/test.csv')
+        _TRACK_CACHE['released']=test[test.id.isna()&test.people.notna()][
+            ['recording','day','weekday','unit','minute','minute_of_day','people']].copy()
+    if schedule is None:
+        if 'schedule' not in _TRACK_CACHE:
+            from prayer_experiments import timetable
+            train=pd.read_csv(ROOT/'data/raw/train.csv');test=pd.read_csv(ROOT/'data/raw/test.csv')
+            _TRACK_CACHE['schedule']=timetable(ROOT/'models/current_baseline/prayer_times_madinah.csv',train,test)
+        schedule=_TRACK_CACHE['schedule']
+    return dict(schedule=schedule,test_released=_TRACK_CACHE['released'],
+        config=copy.deepcopy(DEFAULT_CONFIG[mission]),mission=mission)
+
+
+def _track_fit(mission,training,config,schedule=None):
+    path=config.get('track_module')
+    if not path:return None
+    module=_track_load(path)
+    absent=[d for d in _TRAIN_DATES if d not in set(training.day)]
+    day=absent[0] if len(absent)==1 else None
+    context=_track_context(mission,schedule)
+    return module,module.fit(training.copy(),day,context),context
+
+
+def _track_value(track,mission,t,unit,minute,day=None,now=None,horizon=None):
+    if track is None:return np.nan
+    from types import SimpleNamespace
+    module,model,context=track
+    recording=(str(day).replace('-','')+'_1100') if day is not None else None
+    case=SimpleNamespace(case_id=None,day=day,recording=recording,kind=mission,unit=unit,
+        minute=int(minute),now=now,horizon=horizon)
+    value=module.predict(case,t,model,context)
+    return float(value) if value is not None and np.isfinite(value) else np.nan
+
+
+def fit_hidden(training, config, schedule=None):
     models={'linear': v2_hidden.fit(table(training),alpha=config['alpha'])}
     if config['d_only']:
         import hidden_reconstruction_trial as nonlinear
         models['nonlinear'],_ = nonlinear.fit_new(training,schedule)
-    if config.get('recipe')=='bgd_0800':
-        import hidden_bgd
-        models['bgd']=hidden_bgd.fit(training,released,schedule,config)
+    if config.get('track_module'):models['track']=_track_fit('hidden',training,config,schedule)
     return models
 
 
-def hidden_value(t, unit, minute, models, config, reference=None, day=None, schedule=None, *, legacy_mix=False, baseline_only=False):
+def hidden_value(t, unit, minute, models, config, reference=None, day=None, schedule=None, *, legacy_mix=False):
     linear=models['linear']
     if reference is None:reference=v2_hidden.predict(t,unit,minute,linear,'single')[0]
     method,weight=config['blends'][unit]
@@ -124,22 +179,20 @@ def hidden_value(t, unit, minute, models, config, reference=None, day=None, sche
         x,available=nonlinear.make_features(raw,unit,[day],schedule)
         if available.iloc[0]>=2 and unit in models['nonlinear']:
             value=max(0.,float(models['nonlinear'][unit].predict(x)[0]))
-    if 'bgd' in models and not baseline_only:
-        import hidden_bgd
-        target=pd.DataFrame([dict(id='single',recording='single',unit=unit,day=day,minute_of_day=minute)])
-        values,_,_=hidden_bgd.predict(models['bgd'],target,{'single':t},{'single':reference},
-            {'single':float(value)},config,schedule)
-        value=values['single']
+    track=_track_value(models.get('track'),'hidden',t,unit,minute,day)
+    if np.isfinite(track):value=max(0.,track)
     return float(reference),float(value),float(fitted)
 
 
 def fit_hidden_future(training, schedule, config):
     frames=table(training)
     rec_day=training.groupby('recording').day.first().to_dict()
-    return dict(hidden=v2_hidden.fit(frames),
+    models=dict(hidden=v2_hidden.fit(frames),
         direct=fit_direct(frames,model_params=config['model_params']),
         prayer_direct=fit_direct_variant(frames,rec_day,schedule,'prayer',
             model_params=config['model_params']) if config['saturday_prayer'] else None)
+    if config.get('track_module'):models['track']=_track_fit('hidden-future',training,config,schedule)
+    return models
 
 
 def hidden_future_value(t,unit,now,horizon,day,schedule,models,config,reference=None,*,legacy_mix=False):
@@ -153,14 +206,30 @@ def hidden_future_value(t,unit,now,horizon,day,schedule,models,config,reference=
         fitted=predict_hf(causal,unit,now,horizon,models['hidden'],models['direct'],'direct')
     w=config['weight']
     value=(1-w)*reference+w*fitted if legacy_mix and not (config['saturday_prayer'] and pd.Timestamp(day).day_of_week==5) else reference+w*(fitted-reference)
+    # A track module receives the same prefix: nothing after now can reach it.
+    track=_track_value(models.get('track'),'hidden-future',causal,unit,now+horizon,day,now,horizon)
+    if np.isfinite(track):value=track
     return float(reference),max(0.,float(value)),float(fitted)
 
 
+PARTNER_RATIO_KEY='__partner_ratio__'
+TRACK_KEY='__track__'
+
+
 def fit_missing(training, config):
-    return v2_missing.fit_calibration(table(training))
+    calibration=v2_missing.fit_calibration(table(training))
+    # Optional (off in the accepted baseline): partner-camera ratio filler, see noran_missing.py.
+    # Enable with config['partner_ratio']={'units': [...], 'side': 4, 'max_partners': 2}.
+    options=config.get('partner_ratio')
+    if options:
+        import noran_missing
+        calibration[PARTNER_RATIO_KEY]=noran_missing.fit(table(training),
+            side=options.get('side',4),max_partners=options.get('max_partners',2))
+    if config.get('track_module'):calibration[TRACK_KEY]=_track_fit('missing',training,config)
+    return calibration
 
 
-def missing_value(t,unit,minute,calibration,config,reference=None):
+def missing_value(t,unit,minute,calibration,config,reference=None,day=None):
     if reference is None:reference=v2_missing.predict(t,unit,minute,calibration,'linear')[0]
     value=reference;available=0;gap=np.nan;used=False
     weight=config['weights'].get(unit,0.)
@@ -169,6 +238,14 @@ def missing_value(t,unit,minute,calibration,config,reference=None):
             'blend_full' if weight==1. else 'blend',weight)
         if np.isfinite(fitted) and gap>=config['min_gap'] and available>0:
             value=fitted;used=True
+    options=config.get('partner_ratio')
+    if options and unit in options['units'] and PARTNER_RATIO_KEY in calibration:
+        import noran_missing
+        fitted,partners,partner_gap=noran_missing.predict(t,unit,minute,calibration[PARTNER_RATIO_KEY])
+        if np.isfinite(fitted):
+            value=fitted;used=True;available=len(partners);gap=partner_gap
+    track=_track_value(calibration.get(TRACK_KEY),'missing',t,unit,minute,day)
+    if np.isfinite(track):value=max(0.,track);used=True
     return float(reference),float(value),dict(used=used,donors=available,gap=gap)
 
 
@@ -177,16 +254,9 @@ def predict_hidden(models,targets,feeds,references,config,schedule):
     for r in targets.itertuples():
         ref,value,fitted=hidden_value(feeds[r.recording],r.unit,int(r.minute_of_day),
             models,config,references[r.id],r.day,schedule,
-            legacy_mix=r.unit=='cam_G' and config['blends'][r.unit][1]==.5,baseline_only=True)
+            legacy_mix=r.unit=='cam_G' and config['blends'][r.unit][1]==.5)
         rows.append(dict(id=r.id,people=value,fitted=fitted))
-    result=pd.DataFrame(rows)
-    if 'bgd' in models:
-        import hidden_bgd
-        legacy=result.set_index('id').people.to_dict()
-        values,components,used=hidden_bgd.predict(models['bgd'],targets,feeds,references,legacy,config,schedule)
-        result['legacy_people']=result.people
-        result['people']=result.id.map(values);result['component']=result.id.map(components);result['used']=result.id.map(used)
-    return result
+    return pd.DataFrame(rows)
 
 
 def predict_hidden_future(models,targets,feeds,references,config,schedule):
@@ -203,6 +273,6 @@ def predict_missing(calibration,targets,feeds,references,config):
     rows=[]
     for r in targets.itertuples():
         _,value,meta=missing_value(feeds[r.recording],r.unit,int(r.minute_of_day),
-            calibration,config,references[r.id])
+            calibration,config,references[r.id],day=r.day)
         rows.append(dict(id=r.id,people=value,**meta))
     return pd.DataFrame(rows)

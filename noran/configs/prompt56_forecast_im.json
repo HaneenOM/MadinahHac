@@ -1,0 +1,8 @@
+{
+  "module":"noran/tracks/p56_forecast_im/model.py",
+  "scope":"FORECAST I-M only",
+  "recipe":"Ridge alpha=10, pooled normalized residual over V7; last 5/10-minute causal level and slope features with horizon interactions; nonnegative output",
+  "selection":"No settings selected from assessment errors; one fixed recipe",
+  "validation":"Leave one released test recording/date out; sparse rolling-origin pseudo-cases, separate from fixed/mirror/testday scores",
+  "limitations":"Only two previously examined test dates; released windows differ from the future real request periods."
+}
