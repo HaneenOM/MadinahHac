@@ -1,0 +1,9 @@
+{
+  "hypothesis": "The distribution of observable gap levels and context differs between synthetic training and requests. Unsupervised density-ratio fitting can adapt V7's linear response without learning a new count predictor.",
+  "classifier": "Standardized logistic regression, C=1, balanced classes, max_iter=300, seed=6104",
+  "density_ratio_bounds": [0.25, 4.0],
+  "blend": 0.5,
+  "features": "level, gap geometry, own candidate deviations, partner deviations and availability; no labels, dates or V7 estimates",
+  "selection": "Same source-recording development gate before any new assessment",
+  "limitation": "Earlier fixed/mirror failures informed this hypothesis; subsequent evaluation is exploratory, not fresh independent validation."
+}

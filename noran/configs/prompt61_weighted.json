@@ -1,0 +1,8 @@
+{
+  "hypothesis": "Repeated pseudo-gap variants overrepresent some source readings and long dates. Equal-date, inverse-reading-multiplicity weighting may generalize better while retaining V7's linear response.",
+  "blend": 0.5,
+  "weighting": "inverse number of variants for source/unit/absolute target minute; then normalize total fitting weight equally per calendar date",
+  "ridge": "unchanged V7 0.001",
+  "features_and_candidate_subsets": "unchanged V7",
+  "selection": "Same frozen training-only camera gate; no assessment-dependent revisions"
+}

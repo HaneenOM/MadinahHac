@@ -1,0 +1,13 @@
+{
+  "session_start_utc": "2026-11-19T18:09:25Z",
+  "experiment_cutoff_utc": "2026-11-19T19:29:25Z",
+  "deadline_utc": "2026-11-19T19:39:25Z",
+  "mission": "missing",
+  "hypothesis": "Nonlinear gap geometry and agreement among physically observable candidate fills improve over global linear stack weights.",
+  "selection": "leave entire source recording out on Sep 4/5 and released Sep 18/19 pseudo-gaps; no Sep 11/12 answers in fitting or selection",
+  "assessment": "fixed and mirror targets, both Sep 11/12 dates excluded from all fits; V7 recomputed on identical information",
+  "model": {"iterations": 350, "depth": 5, "learning_rate": 0.04, "loss_function": "MAE", "l2_leaf_reg": 10, "random_seed": 61, "thread_count": 2, "allow_writing_files": false},
+  "blend": 0.5,
+  "max_correction_relative_to_line": 0.5,
+  "promotion": "none; experimental only"
+}

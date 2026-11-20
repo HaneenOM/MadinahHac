@@ -1,0 +1,11 @@
+{
+  "hypothesis": "Visible-camera level deviations have camera-specific predictive value for hidden-camera future levels; a regularized correction to uniform V7 scaling may help without changing timing or templates.",
+  "ridge": 0.05,
+  "strength": 0.5,
+  "max_log_correction": 0.25,
+  "origin_step": 15,
+  "horizons": [5, 10, 15],
+  "development": "Leave entire historical source date out of pairwise calibration; no released-test assessment labels in fit.",
+  "assessment_gate": "Positive equal-source count-MAE gain on >=2/3 source recordings and on both full Sep 11/12 development recordings. Otherwise reject before testday assessment.",
+  "assessment": "testday only if gate passes; fixed/mirror are development evidence already in this model, never claimed fresh validation"
+}

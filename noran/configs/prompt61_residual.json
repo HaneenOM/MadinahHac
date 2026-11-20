@@ -1,0 +1,7 @@
+{
+  "hypothesis": "Learn only errors left by V7, preserving its useful linear partner response; use nested recording cross-fitting for generated V7 features and residual labels.",
+  "model": {"iterations": 300, "depth": 4, "learning_rate": 0.035, "loss_function": "MAE", "l2_leaf_reg": 15, "random_seed": 6102, "thread_count": 2, "allow_writing_files": false},
+  "blend": 0.5,
+  "max_residual_relative_to_line": 0.25,
+  "selection": "Identical preassessment training-only applicability gate as P61 direct. No assessment-answer-based revision."
+}
