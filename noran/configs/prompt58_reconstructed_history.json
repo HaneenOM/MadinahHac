@@ -1,0 +1,21 @@
+{
+  "status": "exploratory; not an adopted baseline",
+  "baseline": "Version 7 HIDDEN-FUTURE hf_final, unchanged recipe",
+  "reconstructor": "V7 HIDDEN v3 constituent; no TabICL v4 member",
+  "history_minutes": 15,
+  "minimum_finite_points": 5,
+  "minimum_same_minute_visible_donors": 2,
+  "slope": "median of all pairwise count slopes using actual minute distances",
+  "correction": "max(0, V7_prediction + 0.5 * slope * horizon)",
+  "trend_share": 0.5,
+  "second_stage_fit": false,
+  "hyperparameter_search": false,
+  "horizon_selection": false,
+  "camera_selection": false,
+  "masking": "B/G jointly or D per recording; assessment camera labels globally removed from fitting across paired recordings",
+  "cross_fitting": "each reconstruction fit excludes its assessment date; no learned second stage",
+  "case_sets": ["fixed", "mirror", "testday"],
+  "validation": "previously inspected dates; correlated exploratory evidence",
+  "p56_smoothing": false,
+  "candidate": null
+}

@@ -1,0 +1,19 @@
+{
+  "status": "feasibility first; exploratory",
+  "history_minutes": 20,
+  "weekday": "exact match",
+  "phase": "same interval between prayer times; endpoint within 15 minutes of prayer-aligned now",
+  "offsets_minutes": [-15, -10, -5, 0, 5, 10, 15],
+  "distance": "mean across cameras of mean absolute centered log1p differences; per-camera median removes level",
+  "minimum_overlap_per_camera": 10,
+  "minimum_cameras": 3,
+  "maximum_shape_mae": 0.35,
+  "neighbors": 2,
+  "diversity": "one segment per distinct source recording/prayer event",
+  "aggregation": "equal mean of two selected target continuations, log1p level shift shrunk by 0.8",
+  "replacement": "preserve V7 residual component: V7 + 0.8 * (matched analog - V7 analog); preserve original fallback",
+  "assessment_labels": "jointly removed globally from all reference library and fitting data",
+  "selection": "context only, never target history or continuation values",
+  "tuning": false,
+  "candidate": null
+}
